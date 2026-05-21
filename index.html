@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>ANS: ANADOLU NETWORK STATE | Stratejik Yönetim Paneli</title>
+    <title>ANS | Stratejik Yönetim Paneli</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -11,11 +11,7 @@
     
     <style>
         * { font-family: 'Inter', sans-serif; }
-        
-        body {
-            background: #0A0C15;
-            overflow-x: hidden;
-        }
+        body { background: #0A0C15; overflow-x: hidden; }
         
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #1A1D2E; }
@@ -32,498 +28,199 @@
             border-radius: 16px;
             transition: all 0.2s ease;
         }
-        .aladdin-card:hover {
-            border-color: #D4AF37;
-            transform: translateY(-2px);
-        }
+        .aladdin-card:hover { border-color: #D4AF37; transform: translateY(-2px); }
         
-        .nav-item {
-            padding: 12px 16px;
-            margin: 4px 8px;
-            border-radius: 12px;
-            transition: all 0.2s;
-            cursor: pointer;
-        }
-        .nav-item:hover, .nav-item.active {
-            background: rgba(212, 175, 55, 0.1);
-            border-left: 3px solid #D4AF37;
-        }
+        .nav-item { padding: 12px 16px; margin: 4px 8px; border-radius: 12px; transition: all 0.2s; cursor: pointer; }
+        .nav-item:hover, .nav-item.active { background: rgba(212, 175, 55, 0.1); border-left: 3px solid #D4AF37; }
         
-        .bloomberg-header {
-            background: #080B14;
-            border-bottom: 1px solid #D4AF37;
-        }
+        .bloomberg-header { background: #080B14; border-bottom: 1px solid #D4AF37; }
+        .kpi-value { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; }
         
-        .kpi-value {
-            font-size: 28px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-        }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; justify-content: center; align-items: center; }
+        .modal.active { display: flex; }
         
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.95);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-        .modal.active {
-            display: flex;
-        }
+        .toast { position: fixed; bottom: 30px; right: 30px; background: #1A1D2E; border-left: 3px solid #D4AF37; padding: 12px 20px; border-radius: 8px; z-index: 1100; transform: translateX(400px); transition: transform 0.3s ease; }
+        .toast.show { transform: translateX(0); }
         
-        .toast {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            background: #1A1D2E;
-            border-left: 3px solid #D4AF37;
-            padding: 12px 20px;
-            border-radius: 8px;
-            z-index: 1100;
-            transform: translateX(400px);
-            transition: transform 0.3s ease;
-        }
-        .toast.show {
-            transform: translateX(0);
-        }
+        .footer-link { transition: color 0.2s; }
+        .footer-link:hover { color: #D4AF37; }
         
-        .footer-link {
-            transition: color 0.2s;
-        }
-        .footer-link:hover {
-            color: #D4AF37;
-        }
+        .package-card { background: linear-gradient(145deg, #0F1222 0%, #0B0E1A 100%); border: 1px solid #1E2340; border-radius: 20px; transition: all 0.3s ease; }
+        .package-card:hover { transform: translateY(-5px); border-color: #D4AF37; box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+        .package-popular { border: 2px solid #D4AF37; position: relative; }
+        .package-popular::before { content: "⭐ POPÜLER"; position: absolute; top: -12px; right: 20px; background: #D4AF37; color: black; font-size: 10px; font-weight: bold; padding: 2px 12px; border-radius: 20px; }
         
-        /* Premium Paket Kartları */
-        .package-card {
-            background: linear-gradient(145deg, #0F1222 0%, #0B0E1A 100%);
-            border: 1px solid #1E2340;
-            border-radius: 20px;
-            transition: all 0.3s ease;
-        }
-        .package-card:hover {
-            transform: translateY(-5px);
-            border-color: #D4AF37;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-        }
-        .package-popular {
-            border: 2px solid #D4AF37;
-            position: relative;
-        }
-        .package-popular::before {
-            content: "⭐ POPÜLER";
-            position: absolute;
-            top: -12px;
-            right: 20px;
-            background: #D4AF37;
-            color: black;
-            font-size: 10px;
-            font-weight: bold;
-            padding: 2px 12px;
-            border-radius: 20px;
-        }
+        .tab-btn.active { background: rgba(212, 175, 55, 0.2); color: #D4AF37; border-bottom: 2px solid #D4AF37; }
     </style>
 </head>
 <body>
 
-<!-- GİRİŞ EKRANI -->
+<!-- GİRİŞ / KAYIT EKRANI -->
 <div id="loginModal" class="modal">
-    <div class="bg-[#0F1222] rounded-2xl p-8 w-96 border border-[#1E2340] gold-glow">
-        <div class="text-center mb-6">
-            <div class="w-16 h-16 gold-bg rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <span class="text-black font-bold text-2xl">🏛️</span>
-            </div>
-            <h2 class="text-white text-xl font-bold">Anadolu Network State</h2>
-            <p class="text-gray-500 text-sm">Stratejik İstihbarat Paneli</p>
+    <div class="bg-[#0F1222] rounded-2xl p-8 w-[420px] border border-[#1E2340] gold-glow">
+        <div class="flex gap-2 mb-6 border-b border-gray-800">
+            <button class="tab-btn flex-1 py-2 text-center text-gray-400 transition" onclick="switchTab('login')">Giriş Yap</button>
+            <button class="tab-btn flex-1 py-2 text-center text-gray-400 transition" onclick="switchTab('register')">Kayıt Ol</button>
         </div>
-        <div class="space-y-4">
+        
+        <!-- GİRİŞ FORMU -->
+        <div id="loginForm" class="space-y-4">
             <div>
                 <label class="text-gray-400 text-sm block mb-2">E-posta</label>
-                <input type="email" id="loginEmail" class="w-full bg-[#1A1D2E] border border-[#2A2D3E] rounded-lg px-4 py-2 text-white focus:border-[#D4AF37] outline-none" placeholder="orhan@anadolunetwork.com">
+                <input type="email" id="loginEmail" class="w-full bg-[#1A1D2E] border border-[#2A2D3E] rounded-lg px-4 py-2 text-white focus:border-[#D4AF37] outline-none" placeholder="ornek@email.com">
             </div>
             <div>
                 <label class="text-gray-400 text-sm block mb-2">Şifre</label>
                 <input type="password" id="loginPassword" class="w-full bg-[#1A1D2E] border border-[#2A2D3E] rounded-lg px-4 py-2 text-white focus:border-[#D4AF37] outline-none" placeholder="••••••••">
             </div>
             <div class="flex items-center justify-between text-sm">
-                <label class="flex items-center gap-2 text-gray-500">
-                    <input type="checkbox" id="rememberMe"> Beni hatırla
-                </label>
-                <a href="#" class="gold-text">Şifremi unuttum</a>
+                <label class="flex items-center gap-2 text-gray-500"><input type="checkbox" id="rememberMe"> Beni hatırla</label>
+                <a href="#" class="gold-text" onclick="showForgotPassword(); return false;">Şifremi unuttum</a>
             </div>
             <button onclick="login()" class="w-full gold-bg text-black font-semibold py-2 rounded-lg hover:opacity-90 transition">Giriş Yap</button>
+            <div class="text-center text-xs text-gray-600 mt-2">Demo: orhan@anadolu.com / 123456</div>
         </div>
-        <div class="mt-6 text-center text-xs text-gray-600">
-            Demo: orhan@anadolunetwork.com / 123456
-        </div>
-        <div class="mt-4 text-center">
-            <a href="#" onclick="showMembershipModal(); return false;" class="text-emerald-400 text-xs hover:underline">Hesabın yok mu? Ortak ol</a>
+        
+        <!-- KAYIT FORMU -->
+        <div id="registerForm" style="display: none;" class="space-y-3">
+            <div>
+                <label class="text-gray-400 text-sm block mb-2">Ad Soyad</label>
+                <input type="text" id="regName" class="w-full bg-[#1A1D2E] border border-[#2A2D3E] rounded-lg px-4 py-2 text-white focus:border-[#D4AF37] outline-none" placeholder="Adınız Soyadınız">
+            </div>
+            <div>
+                <label class="text-gray-400 text-sm block mb-2">E-posta</label>
+                <input type="email" id="regEmail" class="w-full bg-[#1A1D2E] border border-[#2A2D3E] rounded-lg px-4 py-2 text-white focus:border-[#D4AF37] outline-none" placeholder="ornek@email.com">
+            </div>
+            <div>
+                <label class="text-gray-400 text-sm block mb-2">Şifre</label>
+                <input type="password" id="regPassword" class="w-full bg-[#1A1D2E] border border-[#2A2D3E] rounded-lg px-4 py-2 text-white focus:border-[#D4AF37] outline-none" placeholder="••••••••">
+            </div>
+            <div>
+                <label class="text-gray-400 text-sm block mb-2">Şifre Tekrar</label>
+                <input type="password" id="regPasswordConfirm" class="w-full bg-[#1A1D2E] border border-[#2A2D3E] rounded-lg px-4 py-2 text-white focus:border-[#D4AF37] outline-none" placeholder="••••••••">
+            </div>
+            <div class="flex items-center gap-2 text-sm text-gray-500">
+                <input type="checkbox" id="acceptTerms"> <span>Kullanıcı sözleşmesini okudum ve kabul ediyorum</span>
+            </div>
+            <button onclick="register()" class="w-full gold-bg text-black font-semibold py-2 rounded-lg hover:opacity-90 transition">Kayıt Ol</button>
         </div>
     </div>
 </div>
 
-<!-- ÜYELİK / ORTAKLIK PAKETLERİ MODALI -->
+<!-- ŞİFREMİ UNUTTUM MODALI -->
+<div id="forgotPasswordModal" class="modal">
+    <div class="bg-[#0F1222] rounded-2xl p-8 w-[400px] border border-[#1E2340]">
+        <div class="text-center mb-4"><i class="fas fa-key gold-text text-3xl mb-2"></i><h3 class="text-white text-lg">Şifre Sıfırlama</h3></div>
+        <input type="email" id="resetEmail" placeholder="E-posta adresiniz" class="w-full bg-[#1A1D2E] border border-[#2A2D3E] rounded-xl px-4 py-3 text-white">
+        <div class="flex gap-3 mt-5"><button onclick="sendResetLink()" class="flex-1 gold-bg text-black py-2 rounded-xl">Sıfırlama Bağlantısı Gönder</button><button onclick="closeForgotPassword()" class="flex-1 bg-gray-700 text-white py-2 rounded-xl">İptal</button></div>
+    </div>
+</div>
+
+<!-- ORTAKLIK PAKETLERİ MODALI -->
 <div id="membershipModal" class="modal">
-    <div class="bg-[#0F1222] rounded-2xl p-6 w-[900px] max-h-[85vh] overflow-y-auto border border-[#1E2340]">
-        <div class="flex justify-between items-center mb-4">
-            <h2 class="text-white text-xl font-bold"><i class="fas fa-crown gold-text mr-2"></i> Anadolu Network State'e Katıl</h2>
-            <button onclick="closeMembershipModal()" class="text-gray-500 hover:text-white text-xl">&times;</button>
-        </div>
+    <div class="bg-[#0F1222] rounded-2xl p-6 w-[950px] max-h-[85vh] overflow-y-auto border border-[#1E2340]">
+        <div class="flex justify-between items-center mb-4"><h2 class="text-white text-xl font-bold"><i class="fas fa-crown gold-text mr-2"></i> Anadolu Network State'e Katıl</h2><button onclick="closeMembershipModal()" class="text-gray-500 hover:text-white text-xl">&times;</button></div>
         <p class="text-gray-400 text-sm mb-6">Size en uygun ortaklık paketini seçin, Anadolu medeniyetinin inşasında yerinizi alın.</p>
-        
         <div class="grid grid-cols-3 gap-5">
-            <!-- BRONZ PAKET -->
-            <div class="package-card p-5 text-center">
-                <div class="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <i class="fas fa-user text-gray-400 text-2xl"></i>
-                </div>
-                <h3 class="text-white text-lg font-bold">Bronz Üye</h3>
-                <div class="gold-text text-2xl font-bold mt-2">$49<span class="text-sm text-gray-500">/ay</span></div>
-                <ul class="mt-4 space-y-2 text-left text-sm">
-                    <li class="text-gray-300"><i class="fas fa-check-circle text-emerald-400 mr-2"></i> Dijital üyelik</li>
-                    <li class="text-gray-300"><i class="fas fa-check-circle text-emerald-400 mr-2"></i> Topluluk erişimi</li>
-                    <li class="text-gray-300"><i class="fas fa-check-circle text-emerald-400 mr-2"></i> Eğitim içerikleri</li>
-                    <li class="text-gray-500"><i class="fas fa-times-circle text-gray-600 mr-2"></i> Fiziksel erişim yok</li>
-                </ul>
-                <button onclick="selectPackage('Bronz', 49)" class="w-full mt-5 bg-gray-700 text-white py-2 rounded-lg hover:bg-gray-600 transition">Seç</button>
-            </div>
-            
-            <!-- GÜMÜŞ PAKET -->
-            <div class="package-card p-5 text-center">
-                <div class="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <i class="fas fa-user-graduate text-gray-400 text-2xl"></i>
-                </div>
-                <h3 class="text-white text-lg font-bold">Gümüş Üye</h3>
-                <div class="gold-text text-2xl font-bold mt-2">$199<span class="text-sm text-gray-500">/ay</span></div>
-                <ul class="mt-4 space-y-2 text-left text-sm">
-                    <li class="text-gray-300"><i class="fas fa-check-circle text-emerald-400 mr-2"></i> Tüm Bronz özellikleri</li>
-                    <li class="text-gray-300"><i class="fas fa-check-circle text-emerald-400 mr-2"></i> Dashboard read-only</li>
-                    <li class="text-gray-300"><i class="fas fa-check-circle text-emerald-400 mr-2"></i> Yılda 2 gün termal</li>
-                    <li class="text-gray-300"><i class="fas fa-check-circle text-emerald-400 mr-2"></i> Yatırım fırsatları</li>
-                </ul>
-                <button onclick="selectPackage('Gümüş', 199)" class="w-full mt-5 bg-gray-700 text-white py-2 rounded-lg hover:bg-gray-600 transition">Seç</button>
-            </div>
-            
-            <!-- ALTIN PAKET (POPÜLER) -->
-            <div class="package-card package-popular p-5 text-center">
-                <div class="w-16 h-16 gold-bg rounded-full flex items-center justify-center mx-auto mb-3">
-                    <i class="fas fa-crown text-black text-2xl"></i>
-                </div>
-                <h3 class="text-white text-lg font-bold">Altın Üye</h3>
-                <div class="gold-text text-2xl font-bold mt-2">$499<span class="text-sm text-gray-500">/ay</span></div>
-                <ul class="mt-4 space-y-2 text-left text-sm">
-                    <li class="text-gray-300"><i class="fas fa-check-circle text-emerald-400 mr-2"></i> Tüm Gümüş özellikleri</li>
-                    <li class="text-gray-300"><i class="fas fa-check-circle text-emerald-400 mr-2"></i> Tam dashboard erişimi</li>
-                    <li class="text-gray-300"><i class="fas fa-check-circle text-emerald-400 mr-2"></i> Yılda 7 gün termal</li>
-                    <li class="text-gray-300"><i class="fas fa-check-circle text-emerald-400 mr-2"></i> AI strateji asistanı</li>
-                </ul>
-                <button onclick="selectPackage('Altın', 499)" class="w-full mt-5 gold-bg text-black font-semibold py-2 rounded-lg hover:opacity-90 transition">Seç</button>
-            </div>
-            
-            <!-- PLATİN PAKET -->
-            <div class="package-card p-5 text-center">
-                <div class="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <i class="fas fa-gem text-gray-400 text-2xl"></i>
-                </div>
-                <h3 class="text-white text-lg font-bold">Platin Üye</h3>
-                <div class="gold-text text-2xl font-bold mt-2">$1,999<span class="text-sm text-gray-500">/ay</span></div>
-                <ul class="mt-4 space-y-2 text-left text-sm">
-                    <li class="text-gray-300"><i class="fas fa-check-circle text-emerald-400 mr-2"></i> Tüm Altın özellikleri</li>
-                    <li class="text-gray-300"><i class="fas fa-check-circle text-emerald-400 mr-2"></i> Portföy yönetimi</li>
-                    <li class="text-gray-300"><i class="fas fa-check-circle text-emerald-400 mr-2"></i> Sınırsız fiziksel erişim</li>
-                    <li class="text-gray-300"><i class="fas fa-check-circle text-emerald-400 mr-2"></i> Özel VIP hizmetler</li>
-                </ul>
-                <button onclick="selectPackage('Platin', 1999)" class="w-full mt-5 bg-gray-700 text-white py-2 rounded-lg hover:bg-gray-600 transition">Seç</button>
-            </div>
-            
-            <!-- KURUCU PAKET -->
-            <div class="package-card p-5 text-center">
-                <div class="w-16 h-16 gold-bg rounded-full flex items-center justify-center mx-auto mb-3">
-                    <i class="fas fa-star-of-life text-black text-2xl"></i>
-                </div>
-                <h3 class="text-white text-lg font-bold">Kurucu Üye</h3>
-                <div class="gold-text text-2xl font-bold mt-2">$4,999<span class="text-sm text-gray-500">/ay</span></div>
-                <ul class="mt-4 space-y-2 text-left text-sm">
-                    <li class="text-gray-300"><i class="fas fa-check-circle text-emerald-400 mr-2"></i> Tüm Platin özellikleri</li>
-                    <li class="text-gray-300"><i class="fas fa-check-circle text-emerald-400 mr-2"></i> Tam yetki + karar meclisi</li>
-                    <li class="text-gray-300"><i class="fas fa-check-circle text-emerald-400 mr-2"></i> Özel rezidans + hizmet</li>
-                    <li class="text-gray-300"><i class="fas fa-check-circle text-emerald-400 mr-2"></i> Nesil planlaması</li>
-                </ul>
-                <button onclick="selectPackage('Kurucu', 4999)" class="w-full mt-5 bg-gray-700 text-white py-2 rounded-lg hover:bg-gray-600 transition">Seç</button>
-            </div>
-            
-            <!-- YATIRIMCI PAKET -->
-            <div class="package-card p-5 text-center">
-                <div class="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <i class="fas fa-chart-line text-gray-400 text-2xl"></i>
-                </div>
-                <h3 class="text-white text-lg font-bold">Yatırımcı</h3>
-                <div class="gold-text text-2xl font-bold mt-2">$20,000<span class="text-sm text-gray-500">/tek</span></div>
-                <ul class="mt-4 space-y-2 text-left text-sm">
-                    <li class="text-gray-300"><i class="fas fa-check-circle text-emerald-400 mr-2"></i> Founder Node satın alımı</li>
-                    <li class="text-gray-300"><i class="fas fa-check-circle text-emerald-400 mr-2"></i> Hisse senedi opsiyonları</li>
-                    <li class="text-gray-300"><i class="fas fa-check-circle text-emerald-400 mr-2"></i> Yatırım hakları</li>
-                    <li class="text-gray-300"><i class="fas fa-check-circle text-emerald-400 mr-2"></i> Exit katılım hakkı</li>
-                </ul>
-                <button onclick="selectPackage('Yatırımcı', 20000)" class="w-full mt-5 bg-gray-700 text-white py-2 rounded-lg hover:bg-gray-600 transition">Seç</button>
-            </div>
+            <div class="package-card p-5 text-center"><div class="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-3"><i class="fas fa-user text-gray-400 text-2xl"></i></div><h3 class="text-white text-lg font-bold">Bronz Üye</h3><div class="gold-text text-2xl font-bold mt-2">$49<span class="text-sm text-gray-500">/ay</span></div><ul class="mt-4 space-y-2 text-left text-sm"><li class="text-gray-300"><i class="fas fa-check-circle text-emerald-400 mr-2"></i> Dijital üyelik</li><li class="text-gray-300"><i class="fas fa-check-circle text-emerald-400 mr-2"></i> Topluluk erişimi</li><li class="text-gray-300"><i class="fas fa-check-circle text-emerald-400 mr-2"></i> Eğitim içerikleri</li></ul><button onclick="selectPackage('Bronz', 49)" class="w-full mt-5 bg-gray-700 text-white py-2 rounded-lg hover:bg-gray-600">Seç</button></div>
+            <div class="package-card p-5 text-center"><div class="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-3"><i class="fas fa-user-graduate text-gray-400 text-2xl"></i></div><h3 class="text-white text-lg font-bold">Gümüş Üye</h3><div class="gold-text text-2xl font-bold mt-2">$199<span class="text-sm text-gray-500">/ay</span></div><ul class="mt-4 space-y-2 text-left text-sm"><li class="text-gray-300"><i class="fas fa-check-circle text-emerald-400 mr-2"></i> Tüm Bronz özellikleri</li><li class="text-gray-300"><i class="fas fa-check-circle text-emerald-400 mr-2"></i> Dashboard read-only</li><li class="text-gray-300"><i class="fas fa-check-circle text-emerald-400 mr-2"></i> Yılda 2 gün termal</li></ul><button onclick="selectPackage('Gümüş', 199)" class="w-full mt-5 bg-gray-700 text-white py-2 rounded-lg hover:bg-gray-600">Seç</button></div>
+            <div class="package-card package-popular p-5 text-center"><div class="w-16 h-16 gold-bg rounded-full flex items-center justify-center mx-auto mb-3"><i class="fas fa-crown text-black text-2xl"></i></div><h3 class="text-white text-lg font-bold">Altın Üye</h3><div class="gold-text text-2xl font-bold mt-2">$499<span class="text-sm text-gray-500">/ay</span></div><ul class="mt-4 space-y-2 text-left text-sm"><li class="text-gray-300"><i class="fas fa-check-circle text-emerald-400 mr-2"></i> Tüm Gümüş özellikleri</li><li class="text-gray-300"><i class="fas fa-check-circle text-emerald-400 mr-2"></i> Tam dashboard erişimi</li><li class="text-gray-300"><i class="fas fa-check-circle text-emerald-400 mr-2"></i> Yılda 7 gün termal</li></ul><button onclick="selectPackage('Altın', 499)" class="w-full mt-5 gold-bg text-black font-semibold py-2 rounded-lg">Seç</button></div>
+            <div class="package-card p-5 text-center"><div class="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-3"><i class="fas fa-gem text-gray-400 text-2xl"></i></div><h3 class="text-white text-lg font-bold">Platin Üye</h3><div class="gold-text text-2xl font-bold mt-2">$1,999<span class="text-sm text-gray-500">/ay</span></div><ul class="mt-4 space-y-2 text-left text-sm"><li class="text-gray-300"><i class="fas fa-check-circle text-emerald-400 mr-2"></i> Tüm Altın özellikleri</li><li class="text-gray-300"><i class="fas fa-check-circle text-emerald-400 mr-2"></i> Portföy yönetimi</li><li class="text-gray-300"><i class="fas fa-check-circle text-emerald-400 mr-2"></i> Sınırsız fiziksel erişim</li></ul><button onclick="selectPackage('Platin', 1999)" class="w-full mt-5 bg-gray-700 text-white py-2 rounded-lg">Seç</button></div>
+            <div class="package-card p-5 text-center"><div class="w-16 h-16 gold-bg rounded-full flex items-center justify-center mx-auto mb-3"><i class="fas fa-star-of-life text-black text-2xl"></i></div><h3 class="text-white text-lg font-bold">Kurucu Üye</h3><div class="gold-text text-2xl font-bold mt-2">$4,999<span class="text-sm text-gray-500">/ay</span></div><ul class="mt-4 space-y-2 text-left text-sm"><li class="text-gray-300"><i class="fas fa-check-circle text-emerald-400 mr-2"></i> Tüm Platin özellikleri</li><li class="text-gray-300"><i class="fas fa-check-circle text-emerald-400 mr-2"></i> Tam yetki + karar meclisi</li><li class="text-gray-300"><i class="fas fa-check-circle text-emerald-400 mr-2"></i> Özel rezidans + hizmet</li></ul><button onclick="selectPackage('Kurucu', 4999)" class="w-full mt-5 bg-gray-700 text-white py-2 rounded-lg">Seç</button></div>
+            <div class="package-card p-5 text-center"><div class="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-3"><i class="fas fa-chart-line text-gray-400 text-2xl"></i></div><h3 class="text-white text-lg font-bold">Yatırımcı</h3><div class="gold-text text-2xl font-bold mt-2">$20,000<span class="text-sm text-gray-500">/tek</span></div><ul class="mt-4 space-y-2 text-left text-sm"><li class="text-gray-300"><i class="fas fa-check-circle text-emerald-400 mr-2"></i> Founder Node satın alımı</li><li class="text-gray-300"><i class="fas fa-check-circle text-emerald-400 mr-2"></i> Hisse senedi opsiyonları</li><li class="text-gray-300"><i class="fas fa-check-circle text-emerald-400 mr-2"></i> Exit katılım hakkı</li></ul><button onclick="selectPackage('Yatırımcı', 20000)" class="w-full mt-5 bg-gray-700 text-white py-2 rounded-lg">Seç</button></div>
         </div>
-        
-        <div class="mt-6 p-4 bg-gray-800/30 rounded-lg text-center">
-            <p class="text-gray-400 text-xs">Tüm paketlerimizde 14 gün iade garantisi vardır. Sorularınız için <a href="#" class="gold-text">info@anadolunetwork.com</a></p>
-        </div>
+        <div class="mt-6 p-4 bg-gray-800/30 rounded-lg text-center"><p class="text-gray-400 text-xs">Tüm paketlerimizde 14 gün iade garantisi vardır.</p></div>
     </div>
 </div>
 
 <!-- YÖNETİM PANELİ MODALI -->
 <div id="adminPanelModal" class="modal">
     <div class="bg-[#0F1222] rounded-2xl p-6 w-[500px] border border-[#1E2340]">
-        <div class="flex justify-between items-center mb-4">
-            <h2 class="text-white text-xl font-bold"><i class="fas fa-user-cog gold-text mr-2"></i> Yönetim Paneli</h2>
-            <button onclick="closeAdminPanel()" class="text-gray-500 hover:text-white text-xl">&times;</button>
-        </div>
-        
+        <div class="flex justify-between items-center mb-4"><h2 class="text-white text-xl font-bold"><i class="fas fa-user-cog gold-text mr-2"></i> Yönetim Paneli</h2><button onclick="closeAdminPanel()" class="text-gray-500 hover:text-white text-xl">&times;</button></div>
         <div class="space-y-5">
-            <!-- Profil Bilgileri -->
-            <div class="border-b border-[#1E2340] pb-3">
-                <h3 class="gold-text text-sm font-semibold mb-3">Profil Bilgileri</h3>
-                <div class="space-y-2">
-                    <div class="flex items-center gap-2"><i class="fas fa-user text-gray-500 w-6"></i><span class="text-gray-300 text-sm" id="adminName">Orhan BOYRAZ</span></div>
-                    <div class="flex items-center gap-2"><i class="fas fa-envelope text-gray-500 w-6"></i><span class="text-gray-300 text-sm" id="adminEmail">orhan@anadolunetwork.com</span></div>
-                    <div class="flex items-center gap-2"><i class="fas fa-tag text-gray-500 w-6"></i><span class="text-gray-300 text-sm" id="adminRole">Kurucu & Chancellor</span></div>
-                </div>
-            </div>
-            
-            <!-- İstatistikler -->
-            <div class="border-b border-[#1E2340] pb-3">
-                <h3 class="gold-text text-sm font-semibold mb-3">Hesap İstatistikleri</h3>
-                <div class="grid grid-cols-2 gap-3">
-                    <div class="bg-black/40 p-2 rounded-lg text-center"><div class="text-gray-500 text-xs">Üyelik Süresi</div><div class="text-white font-bold">1 yıl 3 ay</div></div>
-                    <div class="bg-black/40 p-2 rounded-lg text-center"><div class="text-gray-500 text-xs">Son Giriş</div><div class="text-white font-bold" id="lastLoginTime">Bugün</div></div>
-                    <div class="bg-black/40 p-2 rounded-lg text-center"><div class="text-gray-500 text-xs">Aktif Oturum</div><div class="text-green-400 font-bold">Evet</div></div>
-                    <div class="bg-black/40 p-2 rounded-lg text-center"><div class="text-gray-500 text-xs">Cihaz</div><div class="text-white font-bold">Web Tarayıcı</div></div>
-                </div>
-            </div>
-            
-            <!-- Şifre Değiştir -->
-            <div class="border-b border-[#1E2340] pb-3">
-                <h3 class="gold-text text-sm font-semibold mb-3">Şifre Değiştir</h3>
-                <input type="password" id="newPassword" placeholder="Yeni şifre" class="w-full bg-[#1A1D2E] border border-[#2A2D3E] rounded-lg px-3 py-2 text-white text-sm mb-2">
-                <input type="password" id="confirmNewPassword" placeholder="Yeni şifre (tekrar)" class="w-full bg-[#1A1D2E] border border-[#2A2D3E] rounded-lg px-3 py-2 text-white text-sm">
-                <button onclick="changeUserPassword()" class="mt-2 gold-bg text-black text-sm font-semibold px-4 py-1.5 rounded-lg">Şifreyi Güncelle</button>
-            </div>
-            
-            <!-- Oturum Yönetimi -->
-            <div>
-                <h3 class="gold-text text-sm font-semibold mb-3">Oturum Yönetimi</h3>
-                <button onclick="logoutFromAdmin()" class="w-full bg-red-600/80 text-white py-2 rounded-lg hover:bg-red-600 transition">Tüm Cihazlardan Çıkış Yap</button>
-            </div>
-        </div>
-        
-        <div class="mt-4 pt-3 border-t border-[#1E2340] text-center">
-            <button onclick="closeAdminPanel()" class="text-gray-500 text-sm">Kapat</button>
+            <div class="border-b border-[#1E2340] pb-3"><h3 class="gold-text text-sm font-semibold mb-3">Profil Bilgileri</h3><div class="space-y-2"><div class="flex items-center gap-2"><i class="fas fa-user text-gray-500 w-6"></i><input type="text" id="adminName" class="bg-transparent text-gray-300 text-sm flex-1 border-b border-gray-700 focus:border-[#D4AF37] outline-none"></div><div class="flex items-center gap-2"><i class="fas fa-envelope text-gray-500 w-6"></i><input type="email" id="adminEmail" class="bg-transparent text-gray-300 text-sm flex-1 border-b border-gray-700 focus:border-[#D4AF37] outline-none"></div><div class="flex items-center gap-2"><i class="fas fa-tag text-gray-500 w-6"></i><span class="text-gray-300 text-sm" id="adminRole">Kullanıcı</span></div></div></div>
+            <div class="border-b border-[#1E2340] pb-3"><h3 class="gold-text text-sm font-semibold mb-3">Şifre Değiştir</h3><input type="password" id="newPassword" placeholder="Yeni şifre" class="w-full bg-[#1A1D2E] border border-[#2A2D3E] rounded-lg px-3 py-2 text-white text-sm mb-2"><input type="password" id="confirmNewPassword" placeholder="Yeni şifre (tekrar)" class="w-full bg-[#1A1D2E] border border-[#2A2D3E] rounded-lg px-3 py-2 text-white text-sm"><button onclick="changeUserPassword()" class="mt-2 gold-bg text-black text-sm font-semibold px-4 py-1.5 rounded-lg">Şifreyi Güncelle</button></div>
+            <div><h3 class="gold-text text-sm font-semibold mb-3">Oturum Yönetimi</h3><button onclick="logoutFromAdmin()" class="w-full bg-red-600/80 text-white py-2 rounded-lg hover:bg-red-600 transition">Tüm Cihazlardan Çıkış Yap</button></div>
+            <div class="pt-3 text-center"><button onclick="updateProfile()" class="gold-bg text-black px-6 py-2 rounded-lg">Profili Güncelle</button></div>
         </div>
     </div>
 </div>
 
 <!-- BİLDİRİM -->
-<div id="toast" class="toast">
-    <div class="flex items-center gap-3">
-        <i class="fas fa-check-circle text-green-400"></i>
-        <span id="toastMessage" class="text-gray-300">Bildirim</span>
-    </div>
-</div>
+<div id="toast" class="toast"><div class="flex items-center gap-3"><i class="fas fa-check-circle text-green-400"></i><span id="toastMessage" class="text-gray-300">Bildirim</span></div></div>
 
 <!-- ANA UYGULAMA -->
 <div id="appContainer" style="display: none;">
     <div class="flex h-screen">
-        
-        <!-- SOL MENU - 24 MODÜL -->
         <div class="w-72 bg-[#0B0E1A] border-r border-[#1E2340] overflow-y-auto flex-shrink-0">
-            <div class="p-5 border-b border-[#1E2340] mb-4">
-                <div class="flex items-center gap-2">
-                    <div class="w-10 h-10 gold-bg rounded-xl flex items-center justify-center">
-                        <span class="text-black font-bold text-xl">🏛️</span>
-                    </div>
-                    <div>
-                        <div class="text-white font-bold text-lg">ANADOLU NETWORK</div>
-                        <div class="text-[#D4AF37] text-xs">Stratejik İstihbarat</div>
-                    </div>
-                </div>
-            </div>
-            
+            <div class="p-5 border-b border-[#1E2340] mb-4"><div class="flex items-center gap-2"><div class="w-10 h-10 gold-bg rounded-xl flex items-center justify-center"><span class="text-black font-bold text-xl">🏛️</span></div><div><div class="text-white font-bold text-lg">ANADOLU NETWORK</div><div class="text-[#D4AF37] text-xs">Stratejik Yönetim Paneli</div></div></div></div>
             <div class="px-3 space-y-1" id="navMenu"></div>
-            
-            <div class="mt-8 p-4 border-t border-[#1E2340]">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full gold-bg flex items-center justify-center text-black font-bold" id="userInitial">O</div>
-                    <div class="flex-1">
-                        <div class="text-white text-sm font-medium" id="userName">Orhan BOYRAZ</div>
-                        <div class="text-gray-500 text-xs" id="userRole">Kurucu & Chancellor</div>
-                    </div>
-                    <button onclick="openAdminPanel()" class="text-gray-500 hover:text-[#D4AF37]">
-                        <i class="fas fa-cog"></i>
-                    </button>
-                    <button onclick="logout()" class="text-gray-500 hover:text-[#D4AF37]">
-                        <i class="fas fa-sign-out-alt"></i>
-                    </button>
-                </div>
-            </div>
+            <div class="mt-8 p-4 border-t border-[#1E2340]"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full gold-bg flex items-center justify-center text-black font-bold" id="userInitial">O</div><div class="flex-1"><div class="text-white text-sm font-medium" id="userName">Orhan BOYRAZ</div><div class="text-gray-500 text-xs" id="userRole">Kullanıcı</div></div><button onclick="openAdminPanel()" class="text-gray-500 hover:text-[#D4AF37]"><i class="fas fa-cog"></i></button><button onclick="logout()" class="text-gray-500 hover:text-[#D4AF37]"><i class="fas fa-sign-out-alt"></i></button></div><button onclick="showMembershipModal()" class="w-full mt-3 text-emerald-400 text-xs hover:underline flex items-center justify-center gap-2"><i class="fas fa-crown"></i> Üyeliğini Yükselt</button></div>
         </div>
         
-        <!-- ANA İÇERİK -->
         <div class="flex-1 overflow-y-auto">
-            
-            <!-- ÜST BAR -->
             <div class="bloomberg-header px-6 py-3 flex justify-between items-center sticky top-0 z-10">
-                <div class="flex items-center gap-4">
-                    <div class="text-[#D4AF37] text-xs font-mono">ANS:DASH</div>
-                    <div class="text-gray-400 text-xs">|</div>
-                    <div class="text-gray-400 text-xs" id="currentDateTime"></div>
-                    <div class="text-gray-400 text-xs">|</div>
-                    <div class="text-green-400 text-xs"><i class="fas fa-circle" style="font-size: 8px;"></i> CANLI</div>
-                    <div class="text-gray-400 text-xs">|</div>
-                    <div class="text-white text-xs" id="activeModuleDisplay">Yönetici Komuta Merkezi</div>
-                </div>
-                <div class="flex items-center gap-4">
-                    <div class="text-white text-sm">Medeniyet: <span class="gold-text font-bold" id="headerCivilization">84.7</span></div>
-                    <div class="text-white text-sm">Risk: <span class="text-yellow-400" id="headerRisk">23</span>/100</div>
-                    <div class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center cursor-pointer" onclick="gosterBildirim('Bildirim yok')">
-                        <i class="fas fa-bell text-gray-400 text-sm"></i>
-                    </div>
-                    <div class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center cursor-pointer" onclick="openAdminPanel()">
-                        <i class="fas fa-cog text-gray-400 text-sm"></i>
-                    </div>
-                </div>
+                <div class="flex items-center gap-4"><div class="text-[#D4AF37] text-xs font-mono">ANS:DASH</div><div class="text-gray-400 text-xs">|</div><div class="text-gray-400 text-xs" id="currentDateTime"></div><div class="text-gray-400 text-xs">|</div><div class="text-green-400 text-xs"><i class="fas fa-circle" style="font-size: 8px;"></i> CANLI</div><div class="text-gray-400 text-xs">|</div><div class="text-white text-xs" id="activeModuleDisplay">Yönetici Komuta Merkezi</div></div>
+                <div class="flex items-center gap-4"><div class="text-white text-sm">Medeniyet: <span class="gold-text font-bold" id="headerCivilization">84.7</span></div><div class="text-white text-sm">Risk: <span class="text-yellow-400" id="headerRisk">23</span>/100</div><div class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center cursor-pointer" onclick="gosterBildirim('Bildirim yok')"><i class="fas fa-bell text-gray-400 text-sm"></i></div></div>
             </div>
-            
-            <!-- MODÜL İÇERİĞİ -->
             <div id="moduleContent" class="p-6"></div>
             
-            <!-- FOOTER - ORHAN BOYRAZ BİLGİLERİ -->
             <footer class="border-t border-[#1E2340] bg-[#0B0E1A] mt-6">
-                <div class="px-6 py-5">
-                    <div class="grid grid-cols-4 gap-8 mb-4">
-                        <div>
-                            <h4 class="gold-text text-sm font-semibold mb-3">ANADOLU NETWORK STATE</h4>
-                            <p class="text-gray-500 text-xs leading-relaxed">Teknoloji destekli, sermaye odaklı, eğitim ve sağlıkla güçlendirilmiş, nesiller boyu yaşayacak küresel ekonomik ve toplumsal medeniyet ekosistemi.</p>
-                        </div>
-                        <div>
-                            <h4 class="gold-text text-sm font-semibold mb-3">KURUCU</h4>
-                            <p class="text-gray-300 text-sm font-medium">Orhan BOYRAZ</p>
-                            <p class="text-gray-500 text-xs mt-1">Stratejik Lider & Chancellor</p>
-                        </div>
-                        <div>
-                            <h4 class="gold-text text-sm font-semibold mb-3">İLETİŞİM</h4>
-                            <p class="text-gray-500 text-xs"><i class="fas fa-envelope mr-2"></i> orhan@anadolunetwork.com</p>
-                            <p class="text-gray-500 text-xs mt-1"><i class="fas fa-phone mr-2"></i> +90 (540) 966 66 02</p>
-                            <p class="text-gray-500 text-xs mt-1"><i class="fas fa-map-marker-alt mr-2"></i> Bursa / Türkiye</p>
-                        </div>
-                        <div>
-                            <h4 class="gold-text text-sm font-semibold mb-3">HIZLI BAĞLANTILAR</h4>
-                            <div class="flex gap-3">
-                                <a href="#" class="text-gray-500 hover:text-[#D4AF37] transition"><i class="fab fa-linkedin text-lg"></i></a>
-                                <a href="#" class="text-gray-500 hover:text-[#D4AF37] transition"><i class="fab fa-twitter text-lg"></i></a>
-                                <a href="#" class="text-gray-500 hover:text-[#D4AF37] transition"><i class="fab fa-github text-lg"></i></a>
-                                <a href="#" class="text-gray-500 hover:text-[#D4AF37] transition"><i class="fab fa-instagram text-lg"></i></a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="border-t border-[#1E2340] pt-4 flex justify-between items-center text-xs text-gray-600">
-                        <div class="flex gap-4">
-                            <span>© 2024 Anadolu Network State</span>
-                            <span>|</span>
-                            <span>Tüm hakları saklıdır</span>
-                            <span>|</span>
-                            <span>v2.0.1</span>
-                        </div>
-                        <div class="flex gap-4">
-                            <a href="#" class="footer-link text-gray-600 hover:text-[#D4AF37]">Kurumsal</a>
-                            <a href="#" class="footer-link text-gray-600 hover:text-[#D4AF37]">Gizlilik Politikası</a>
-                            <a href="#" class="footer-link text-gray-600 hover:text-[#D4AF37]">KVKK</a>
-                            <a href="#" class="footer-link text-gray-600 hover:text-[#D4AF37]">İletişim</a>
-                        </div>
-                    </div>
+                <div class="px-6 py-5"><div class="grid grid-cols-4 gap-8 mb-4"><div><h4 class="gold-text text-sm font-semibold mb-3">ANADOLU NETWORK STATE</h4><p class="text-gray-500 text-xs leading-relaxed">Teknoloji destekli, sermaye odaklı, eğitim ve sağlıkla güçlendirilmiş, nesiller boyu yaşayacak küresel ekonomik ve toplumsal medeniyet ekosistemi.</p></div><div><h4 class="gold-text text-sm font-semibold mb-3">KURUCU</h4><p class="text-gray-300 text-sm font-medium">Orhan BOYRAZ</p><p class="text-gray-500 text-xs mt-1">Stratejik Lider & Chancellor</p></div><div><h4 class="gold-text text-sm font-semibold mb-3">İLETİŞİM</h4><p class="text-gray-500 text-xs"><i class="fas fa-envelope mr-2"></i> orhan@anadolunetwork.com</p><p class="text-gray-500 text-xs mt-1"><i class="fas fa-phone mr-2"></i> +90 (540) 966 66 02</p><p class="text-gray-500 text-xs mt-1"><i class="fas fa-map-marker-alt mr-2"></i> Bursa / Türkiye</p></div><div><h4 class="gold-text text-sm font-semibold mb-3">HIZLI BAĞLANTILAR</h4><div class="flex gap-3"><a href="#" class="text-gray-500 hover:text-[#D4AF37]"><i class="fab fa-linkedin text-lg"></i></a><a href="#" class="text-gray-500 hover:text-[#D4AF37]"><i class="fab fa-twitter text-lg"></i></a><a href="#" class="text-gray-500 hover:text-[#D4AF37]"><i class="fab fa-github text-lg"></i></a><a href="#" class="text-gray-500 hover:text-[#D4AF37]"><i class="fab fa-instagram text-lg"></i></a></div></div></div>
+                    <div class="border-t border-[#1E2340] pt-4 flex justify-between items-center text-xs text-gray-600"><div class="flex gap-4"><span>© 2024 Anadolu Network State</span><span>|</span><span>Tüm hakları saklıdır</span><span>|</span><span>v3.0.0</span></div><div class="flex gap-4"><a href="#" class="footer-link text-gray-600 hover:text-[#D4AF37]">Kurumsal</a><a href="#" class="footer-link text-gray-600 hover:text-[#D4AF37]">Gizlilik</a><a href="#" class="footer-link text-gray-600 hover:text-[#D4AF37]">KVKK</a><a href="#" class="footer-link text-gray-600 hover:text-[#D4AF37]">İletişim</a></div></div>
                 </div>
             </footer>
-            
         </div>
     </div>
 </div>
 
 <script>
 // ============================================
-// KULLANICI OTURUMU
+// KULLANICI VERİTABANI (localStorage)
 // ============================================
-
+let users = JSON.parse(localStorage.getItem('ans_users') || '[]');
 let currentUser = null;
 
-function gosterBildirim(mesaj) {
+function gosterBildirim(mesaj, isError = false) {
     const toast = document.getElementById('toast');
     const toastMessage = document.getElementById('toastMessage');
     toastMessage.innerHTML = mesaj;
     toast.classList.add('show');
-    setTimeout(() => {
-        toast.classList.remove('show');
-    }, 3000);
+    setTimeout(() => { toast.classList.remove('show'); }, 3000);
 }
 
-// Üyelik Modal
-function showMembershipModal() {
-    document.getElementById('membershipModal').classList.add('active');
-}
-
-function closeMembershipModal() {
-    document.getElementById('membershipModal').classList.remove('active');
-}
-
-// Paket Seçimi
-function selectPackage(packageName, price) {
-    closeMembershipModal();
-    gosterBildirim(`${packageName} paketi seçildi! Ödeme sayfasına yönlendiriliyorsunuz.`);
-    setTimeout(() => {
-        gosterBildirim(`🎉 Tebrikler! ${packageName} üyeliğiniz başlatıldı. Hoş geldiniz!`);
-    }, 1500);
-}
-
-// Yönetim Paneli
-function openAdminPanel() {
-    document.getElementById('adminPanelModal').classList.add('active');
-}
-
-function closeAdminPanel() {
-    document.getElementById('adminPanelModal').classList.remove('active');
-}
-
-function changeUserPassword() {
-    const newPwd = document.getElementById('newPassword').value;
-    const confirmPwd = document.getElementById('confirmNewPassword').value;
-    if (!newPwd || !confirmPwd) {
-        gosterBildirim('Lütfen yeni şifrenizi girin!');
-        return;
+function switchTab(tab) {
+    if(tab === 'login') {
+        document.getElementById('loginForm').style.display = 'block';
+        document.getElementById('registerForm').style.display = 'none';
+    } else {
+        document.getElementById('loginForm').style.display = 'none';
+        document.getElementById('registerForm').style.display = 'block';
     }
-    if (newPwd !== confirmPwd) {
-        gosterBildirim('Şifreler uyuşmuyor!');
-        return;
-    }
-    if (newPwd.length < 4) {
-        gosterBildirim('Şifre en az 4 karakter olmalı!');
-        return;
-    }
-    gosterBildirim('Şifreniz başarıyla değiştirildi!');
-    document.getElementById('newPassword').value = '';
-    document.getElementById('confirmNewPassword').value = '';
-    closeAdminPanel();
 }
 
-function logoutFromAdmin() {
-    closeAdminPanel();
-    logout();
+function register() {
+    const name = document.getElementById('regName').value.trim();
+    const email = document.getElementById('regEmail').value.trim();
+    const password = document.getElementById('regPassword').value;
+    const confirm = document.getElementById('regPasswordConfirm').value;
+    const accept = document.getElementById('acceptTerms').checked;
+    
+    if(!name || !email || !password) { gosterBildirim('Tüm alanları doldurun!', true); return; }
+    if(password !== confirm) { gosterBildirim('Şifreler uyuşmuyor!', true); return; }
+    if(password.length < 4) { gosterBildirim('Şifre en az 4 karakter olmalı!', true); return; }
+    if(!accept) { gosterBildirim('Kullanıcı sözleşmesini kabul edin!', true); return; }
+    if(users.find(u => u.email === email)) { gosterBildirim('Bu e-posta zaten kayıtlı!', true); return; }
+    
+    users.push({ name, email, password, role: 'Üye', initial: name.charAt(0).toUpperCase(), package: 'Bronz', registeredAt: new Date().toISOString() });
+    localStorage.setItem('ans_users', JSON.stringify(users));
+    gosterBildirim('Kayıt başarılı! Şimdi giriş yapabilirsiniz.');
+    switchTab('login');
+    document.getElementById('regName').value = '';
+    document.getElementById('regEmail').value = '';
+    document.getElementById('regPassword').value = '';
+    document.getElementById('regPasswordConfirm').value = '';
+    document.getElementById('acceptTerms').checked = false;
 }
 
 function login() {
@@ -531,73 +228,29 @@ function login() {
     const password = document.getElementById('loginPassword').value;
     const remember = document.getElementById('rememberMe').checked;
     
-    if ((email === 'orhan@anadolunetwork.com' || email === 'chancellor@ans.com' || email === 'orhan') && password === '123456') {
-        currentUser = { name: 'Orhan BOYRAZ', role: 'Kurucu & Chancellor', initial: 'O', permissions: 'all', email: email };
-        if (remember) {
-            localStorage.setItem('ans_user', JSON.stringify(currentUser));
-        }
+    const user = users.find(u => u.email === email && u.password === password);
+    if(user) {
+        currentUser = user;
+        if(remember) localStorage.setItem('ans_current_user', JSON.stringify(currentUser));
         document.getElementById('loginModal').classList.remove('active');
         document.getElementById('appContainer').style.display = 'flex';
         document.getElementById('userName').innerText = currentUser.name;
         document.getElementById('userRole').innerText = currentUser.role;
         document.getElementById('userInitial').innerText = currentUser.initial;
-        document.getElementById('adminName').innerText = currentUser.name;
-        document.getElementById('adminEmail').innerText = email;
-        document.getElementById('adminRole').innerText = currentUser.role;
-        document.getElementById('lastLoginTime').innerText = new Date().toLocaleString('tr-TR');
-        gosterBildirim(`Hoş geldiniz, ${currentUser.name}`);
-        buildNavigation();
-        renderModule('command');
-    } else if (email === 'ceo@ans.com' && password === '123456') {
-        currentUser = { name: 'Mehmet Demir', role: 'CEO', initial: 'M', permissions: 'exec', email: email };
-        if (remember) localStorage.setItem('ans_user', JSON.stringify(currentUser));
-        document.getElementById('loginModal').classList.remove('active');
-        document.getElementById('appContainer').style.display = 'flex';
-        document.getElementById('userName').innerText = currentUser.name;
-        document.getElementById('userRole').innerText = currentUser.role;
-        document.getElementById('userInitial').innerText = currentUser.initial;
-        document.getElementById('adminName').innerText = currentUser.name;
-        document.getElementById('adminEmail').innerText = email;
-        document.getElementById('adminRole').innerText = currentUser.role;
-        gosterBildirim(`Hoş geldiniz, ${currentUser.name}`);
-        buildNavigation();
-        renderModule('command');
-    } else if (email === 'cfo@ans.com' && password === '123456') {
-        currentUser = { name: 'Zeynep Kaya', role: 'CFO', initial: 'Z', permissions: 'finance', email: email };
-        if (remember) localStorage.setItem('ans_user', JSON.stringify(currentUser));
-        document.getElementById('loginModal').classList.remove('active');
-        document.getElementById('appContainer').style.display = 'flex';
-        document.getElementById('userName').innerText = currentUser.name;
-        document.getElementById('userRole').innerText = currentUser.role;
-        document.getElementById('userInitial').innerText = currentUser.initial;
-        document.getElementById('adminName').innerText = currentUser.name;
-        document.getElementById('adminEmail').innerText = email;
-        document.getElementById('adminRole').innerText = currentUser.role;
-        gosterBildirim(`Hoş geldiniz, ${currentUser.name}`);
-        buildNavigation();
-        renderModule('command');
-    } else if (email === 'member@ans.com' && password === '123456') {
-        currentUser = { name: 'Ali Demir', role: 'Üye', initial: 'A', permissions: 'member', email: email };
-        if (remember) localStorage.setItem('ans_user', JSON.stringify(currentUser));
-        document.getElementById('loginModal').classList.remove('active');
-        document.getElementById('appContainer').style.display = 'flex';
-        document.getElementById('userName').innerText = currentUser.name;
-        document.getElementById('userRole').innerText = currentUser.role;
-        document.getElementById('userInitial').innerText = currentUser.initial;
-        document.getElementById('adminName').innerText = currentUser.name;
-        document.getElementById('adminEmail').innerText = email;
+        document.getElementById('adminName').value = currentUser.name;
+        document.getElementById('adminEmail').value = currentUser.email;
         document.getElementById('adminRole').innerText = currentUser.role;
         gosterBildirim(`Hoş geldiniz, ${currentUser.name}`);
         buildNavigation();
         renderModule('command');
     } else {
-        gosterBildirim('Hatalı e-posta veya şifre!');
+        gosterBildirim('Hatalı e-posta veya şifre!', true);
     }
 }
 
 function logout() {
     currentUser = null;
-    localStorage.removeItem('ans_user');
+    localStorage.removeItem('ans_current_user');
     document.getElementById('appContainer').style.display = 'none';
     document.getElementById('loginModal').classList.add('active');
     document.getElementById('loginEmail').value = '';
@@ -605,243 +258,160 @@ function logout() {
     gosterBildirim('Çıkış yapıldı');
 }
 
-window.onload = function() {
-    const savedUser = localStorage.getItem('ans_user');
-    if (savedUser) {
-        currentUser = JSON.parse(savedUser);
-        document.getElementById('loginModal').classList.remove('active');
-        document.getElementById('appContainer').style.display = 'flex';
+function updateProfile() {
+    if(currentUser) {
+        currentUser.name = document.getElementById('adminName').value;
+        currentUser.email = document.getElementById('adminEmail').value;
+        currentUser.initial = currentUser.name.charAt(0).toUpperCase();
+        const index = users.findIndex(u => u.email === currentUser.email);
+        if(index !== -1) users[index] = currentUser;
+        localStorage.setItem('ans_users', JSON.stringify(users));
+        localStorage.setItem('ans_current_user', JSON.stringify(currentUser));
         document.getElementById('userName').innerText = currentUser.name;
-        document.getElementById('userRole').innerText = currentUser.role;
         document.getElementById('userInitial').innerText = currentUser.initial;
-        document.getElementById('adminName').innerText = currentUser.name;
-        document.getElementById('adminEmail').innerText = currentUser.email || 'orhan@anadolunetwork.com';
-        document.getElementById('adminRole').innerText = currentUser.role;
-        buildNavigation();
-        renderModule('command');
-    } else {
-        document.getElementById('loginModal').classList.add('active');
+        gosterBildirim('Profil güncellendi!');
+        closeAdminPanel();
     }
-    updateDateTime();
-    setInterval(updateDateTime, 1000);
+}
+
+function changeUserPassword() {
+    const newPwd = document.getElementById('newPassword').value;
+    const confirmPwd = document.getElementById('confirmNewPassword').value;
+    if(!newPwd || !confirmPwd) { gosterBildirim('Lütfen yeni şifrenizi girin!', true); return; }
+    if(newPwd !== confirmPwd) { gosterBildirim('Şifreler uyuşmuyor!', true); return; }
+    if(newPwd.length < 4) { gosterBildirim('Şifre en az 4 karakter olmalı!', true); return; }
+    if(currentUser) {
+        currentUser.password = newPwd;
+        const index = users.findIndex(u => u.email === currentUser.email);
+        if(index !== -1) users[index] = currentUser;
+        localStorage.setItem('ans_users', JSON.stringify(users));
+        localStorage.setItem('ans_current_user', JSON.stringify(currentUser));
+        gosterBildirim('Şifreniz değiştirildi!');
+        document.getElementById('newPassword').value = '';
+        document.getElementById('confirmNewPassword').value = '';
+        closeAdminPanel();
+    }
+}
+
+function logoutFromAdmin() { closeAdminPanel(); logout(); }
+function openAdminPanel() { document.getElementById('adminPanelModal').classList.add('active'); }
+function closeAdminPanel() { document.getElementById('adminPanelModal').classList.remove('active'); }
+function showMembershipModal() { document.getElementById('membershipModal').classList.add('active'); }
+function closeMembershipModal() { document.getElementById('membershipModal').classList.remove('active'); }
+function selectPackage(packageName, price) { closeMembershipModal(); gosterBildirim(`${packageName} paketi seçildi! Ödeme sayfasına yönlendiriliyorsunuz.`); setTimeout(() => { gosterBildirim(`🎉 ${packageName} üyeliğiniz başlatıldı!`); if(currentUser) { currentUser.package = packageName; const idx = users.findIndex(u=>u.email===currentUser.email); if(idx!==-1) users[idx]=currentUser; localStorage.setItem('ans_users',JSON.stringify(users)); localStorage.setItem('ans_current_user',JSON.stringify(currentUser)); } }, 1500); }
+
+function showForgotPassword() { document.getElementById('forgotPasswordModal').classList.add('active'); }
+function closeForgotPassword() { document.getElementById('forgotPasswordModal').classList.remove('active'); document.getElementById('resetEmail').value = ''; }
+function sendResetLink() { const email = document.getElementById('resetEmail').value; if(!email) { gosterBildirim('E-posta girin!', true); return; } const user = users.find(u => u.email === email); if(user) { gosterBildirim(`Şifre sıfırlama bağlantısı ${email} adresine gönderildi.`); } else { gosterBildirim('Bu e-posta ile kayıtlı kullanıcı bulunamadı!', true); } closeForgotPassword(); }
+
+window.onload = function() {
+    const savedUser = localStorage.getItem('ans_current_user');
+    if(savedUser) { currentUser = JSON.parse(savedUser); document.getElementById('loginModal').classList.remove('active'); document.getElementById('appContainer').style.display = 'flex'; document.getElementById('userName').innerText = currentUser.name; document.getElementById('userRole').innerText = currentUser.role; document.getElementById('userInitial').innerText = currentUser.initial; document.getElementById('adminName').value = currentUser.name; document.getElementById('adminEmail').value = currentUser.email; document.getElementById('adminRole').innerText = currentUser.role; buildNavigation(); renderModule('command'); } 
+    else { document.getElementById('loginModal').classList.add('active'); }
+    updateDateTime(); setInterval(updateDateTime, 1000);
 };
 
 // ============================================
-// 24 MODÜL TANIMI (TÜRKÇE) - TAMAMI ÇALIŞIYOR
+// 24 MODÜL TANIMI - TAMAMI ÇALIŞIYOR
 // ============================================
-
 const modules = [
-    { id: "command", name: "Yönetici Komuta Merkezi", icon: "fa-tv", group: "core" },
-    { id: "vision", name: "Vizyon & Misyon Paneli", icon: "fa-eye", group: "core" },
-    { id: "okr", name: "OKR Yönetim Sistemi", icon: "fa-bullseye", group: "core" },
-    { id: "kpi", name: "KPI & Metrikler", icon: "fa-chart-line", group: "core" },
-    { id: "financial", name: "Finans Kontrol Kulesi", icon: "fa-landmark", group: "finance" },
-    { id: "portfolio", name: "Yatırım Portföyü", icon: "fa-chart-pie", group: "finance" },
-    { id: "familyoffice", name: "Aile Ofisi Paneli", icon: "fa-crown", group: "finance" },
-    { id: "community", name: "Topluluk & Üyelik", icon: "fa-users", group: "people" },
-    { id: "crm", name: "CRM & İlişki Yönetimi", icon: "fa-address-card", group: "people" },
-    { id: "education", name: "Eğitim Akademisi", icon: "fa-graduation-cap", group: "people" },
-    { id: "health", name: "Sağlık & Termal", icon: "fa-heartbeat", group: "people" },
-    { id: "agriculture", name: "Tarım & Doğal Gıda", icon: "fa-seedling", group: "assets" },
-    { id: "ecommerce", name: "E-Ticaret & İhracat", icon: "fa-shopping-cart", group: "assets" },
-    { id: "realestate", name: "Gayrimenkul & Şehir", icon: "fa-building", group: "assets" },
-    { id: "energy", name: "Enerji & Madencilik", icon: "fa-solar-panel", group: "assets" },
-    { id: "media", name: "Medya & Yayıncılık", icon: "fa-newspaper", group: "assets" },
-    { id: "ai", name: "Yapay Zeka Laboratuvarı", icon: "fa-microchip", group: "tech" },
-    { id: "risk", name: "Risk Yönetim Merkezi", icon: "fa-shield-alt", group: "tech" },
-    { id: "legal", name: "Hukuk & Uyum", icon: "fa-gavel", group: "tech" },
-    { id: "hr", name: "İK & Yetenek Yönetimi", icon: "fa-user-plus", group: "people" },
-    { id: "partnerships", name: "Stratejik Ortaklıklar", icon: "fa-handshake", group: "core" },
-    { id: "philanthropy", name: "Vakıf & Sosyal Etki", icon: "fa-heart", group: "core" },
-    { id: "civilization", name: "Medeniyet Etki Endeksi", icon: "fa-globe-asia", group: "core" },
-    { id: "multigen", name: "Çok Nesil Servet", icon: "fa-tree", group: "finance" }
+    { id: "command", name: "Yönetici Komuta Merkezi", icon: "fa-tv", group: "core", desc: "Tüm KPI'ların özeti, kritik uyarılar, AI özeti" },
+    { id: "vision", name: "Vizyon & Misyon Paneli", icon: "fa-eye", group: "core", desc: "ANS vizyonu, misyonu, stratejik hedefler" },
+    { id: "okr", name: "OKR Yönetim Sistemi", icon: "fa-bullseye", group: "core", desc: "Hedefler, anahtar sonuçlar, ilerleme takibi" },
+    { id: "kpi", name: "KPI & Metrikler", icon: "fa-chart-line", group: "core", desc: "Tüm temel performans göstergeleri" },
+    { id: "financial", name: "Finans Kontrol Kulesi", icon: "fa-landmark", group: "finance", desc: "Gelir-gider, nakit akışı, bütçe" },
+    { id: "portfolio", name: "Yatırım Portföyü", icon: "fa-chart-pie", group: "finance", desc: "Varlık dağılımı, getiriler, risk analizi" },
+    { id: "familyoffice", name: "Aile Ofisi Paneli", icon: "fa-crown", group: "finance", desc: "Servet yönetimi, nesil planlaması" },
+    { id: "community", name: "Topluluk & Üyelik", icon: "fa-users", group: "people", desc: "Üye istatistikleri, demografi" },
+    { id: "crm", name: "CRM & İlişki Yönetimi", icon: "fa-address-card", group: "people", desc: "Üye ilişkileri, etkileşimler" },
+    { id: "education", name: "Eğitim Akademisi", icon: "fa-graduation-cap", group: "people", desc: "Kurslar, sertifikalar, öğrenci takibi" },
+    { id: "health", name: "Sağlık & Termal", icon: "fa-heartbeat", group: "people", desc: "Sağlık hizmetleri, termal kampüs" },
+    { id: "agriculture", name: "Tarım & Doğal Gıda", icon: "fa-seedling", group: "assets", desc: "Tarım üretimi, gıda zinciri" },
+    { id: "ecommerce", name: "E-Ticaret & İhracat", icon: "fa-shopping-cart", group: "assets", desc: "Satışlar, ihracat hacmi" },
+    { id: "realestate", name: "Gayrimenkul & Şehir", icon: "fa-building", group: "assets", desc: "Projeler, arsa, inşaat" },
+    { id: "energy", name: "Enerji & Madencilik", icon: "fa-solar-panel", group: "assets", desc: "Enerji üretimi, maden yatırımları" },
+    { id: "media", name: "Medya & Yayıncılık", icon: "fa-newspaper", group: "assets", desc: "İçerik üretimi, yayıncılık" },
+    { id: "ai", name: "Yapay Zeka Laboratuvarı", icon: "fa-microchip", group: "tech", desc: "AI projeleri, Ar-Ge" },
+    { id: "risk", name: "Risk Yönetim Merkezi", icon: "fa-shield-alt", group: "tech", desc: "Risk analizi, heatmap, senaryolar" },
+    { id: "legal", name: "Hukuk & Uyum", icon: "fa-gavel", group: "tech", desc: "Yasal uyum, sözleşmeler" },
+    { id: "hr", name: "İK & Yetenek Yönetimi", icon: "fa-user-plus", group: "people", desc: "Personel, yetenek havuzu" },
+    { id: "partnerships", name: "Stratejik Ortaklıklar", icon: "fa-handshake", group: "core", desc: "İşbirlikleri, network" },
+    { id: "philanthropy", name: "Vakıf & Sosyal Etki", icon: "fa-heart", group: "core", desc: "Sosyal sorumluluk, bağışlar" },
+    { id: "civilization", name: "Medeniyet Etki Endeksi", icon: "fa-globe-asia", group: "core", desc: "Medeniyet ölçümü, 6 faktör" },
+    { id: "multigen", name: "Çok Nesil Servet", icon: "fa-tree", group: "finance", desc: "Nesil planlaması, trust" }
 ];
 
-// ============================================
-// VERİ MODELİ
-// ============================================
-
 let dashboardData = {
-    toplamVarlik: 184200000,
-    netServet: 127800000,
-    aylikNakitAkisi: 2400000,
-    yillikBuyume: 14.2,
-    portfoyGetirisi: 12.8,
-    riskSkoru: 23,
-    uyeSayisi: 847,
-    aktifAbone: 623,
-    ltv: 12400,
-    cac: 380,
-    nps: 72,
-    ogrenciSayisi: 1240,
-    hastaSayisi: 5600,
-    ecommerceHacim: 3800000,
-    ihracatTutari: 1240000,
-    gayrimenkulDegeri: 52000000,
-    esgSkoru: 84,
-    cokNesilEndeksi: 76,
-    medeniyetSkoru: 84.7,
+    toplamVarlik: 184200000, netServet: 127800000, aylikNakitAkisi: 2400000, yillikBuyume: 14.2, portfoyGetirisi: 12.8, riskSkoru: 23, uyeSayisi: 847, aktifAbone: 623, ltv: 12400, cac: 380, nps: 72, ogrenciSayisi: 1240, hastaSayisi: 5600, ecommerceHacim: 3800000, ihracatTutari: 1240000, gayrimenkulDegeri: 52000000, esgSkoru: 84, cokNesilEndeksi: 76, medeniyetSkoru: 84.7,
     medeniyetFaktorleri: { bilgi: 92, kurumlar: 78, liderlik: 88, sermaye: 85, kultur: 91, nesiller: 74 },
     portfoy: [{ name: "Teknoloji", value: 35 }, { name: "Gayrimenkul", value: 28 }, { name: "Finans", value: 18 }, { name: "Enerji", value: 12 }, { name: "Tarım", value: 7 }],
-    riskler: [
-        { name: "Jeopolitik", skor: 38, seviye: "yuksek" }, { name: "Piyasa", skor: 27, seviye: "orta" }, { name: "Operasyonel", skor: 18, seviye: "dusuk" },
-        { name: "Siber", skor: 15, seviye: "dusuk" }, { name: "Regülasyon", skor: 31, seviye: "orta" }, { name: "İtibar", skor: 12, seviye: "dusuk" },
-        { name: "Likidite", skor: 22, seviye: "dusuk-orta" }, { name: "Kurumsal", skor: 19, seviye: "dusuk-orta" }, { name: "Çevresel", skor: 14, seviye: "dusuk" }, { name: "Sosyal", skor: 16, seviye: "dusuk" }
-    ],
-    okrlar: [
-        { hedef: "Medeniyet Endeksi 90'a çıkarılsın", ilerleme: 84, target: 90, tarih: "2025-12" },
-        { hedef: "Üye sayısı 2,500'e ulaşsın", ilerleme: 847, target: 2500, tarih: "2025-12" },
-        { hedef: "Portföy getirisi %15 olsun", ilerleme: 12.8, target: 15, tarih: "2025-06" },
-        { hedef: "Termal kampüs açılışı", ilerleme: 65, target: 100, tarih: "2025-03" }
-    ],
-    uyeTrend: [320, 345, 378, 402, 445, 478, 512, 556, 602, 658, 712, 780, 847],
-    uyeAylar: ["Ara", "Oca", "Şub", "Mar", "Nis", "May", "Haz", "Tem", "Ağu", "Eyl", "Eki", "Kas", "Ara"],
-    medeniyetTrend: [68, 69, 71, 70, 72, 74, 75, 77, 79, 81, 83, 84.7],
-    medeniyetAylar: ["May", "Haz", "Tem", "Ağu", "Eyl", "Eki", "Kas", "Ara", "Oca", "Şub", "Mar", "Nis"]
+    riskler: [{ name: "Jeopolitik", skor: 38, seviye: "yuksek" }, { name: "Piyasa", skor: 27, seviye: "orta" }, { name: "Operasyonel", skor: 18, seviye: "dusuk" }, { name: "Siber", skor: 15, seviye: "dusuk" }, { name: "Regülasyon", skor: 31, seviye: "orta" }, { name: "İtibar", skor: 12, seviye: "dusuk" }, { name: "Likidite", skor: 22, seviye: "dusuk-orta" }, { name: "Kurumsal", skor: 19, seviye: "dusuk-orta" }, { name: "Çevresel", skor: 14, seviye: "dusuk" }, { name: "Sosyal", skor: 16, seviye: "dusuk" }],
+    okrlar: [{ hedef: "Medeniyet Endeksi 90'a çıkarılsın", ilerleme: 84, target: 90, tarih: "2025-12" }, { hedef: "Üye sayısı 2,500'e ulaşsın", ilerleme: 847, target: 2500, tarih: "2025-12" }, { hedef: "Portföy getirisi %15 olsun", ilerleme: 12.8, target: 15, tarih: "2025-06" }, { hedef: "Termal kampüs açılışı", ilerleme: 65, target: 100, tarih: "2025-03" }],
+    uyeTrend: [320, 345, 378, 402, 445, 478, 512, 556, 602, 658, 712, 780, 847], uyeAylar: ["Ara", "Oca", "Şub", "Mar", "Nis", "May", "Haz", "Tem", "Ağu", "Eyl", "Eki", "Kas", "Ara"],
+    medeniyetTrend: [68, 69, 71, 70, 72, 74, 75, 77, 79, 81, 83, 84.7], medeniyetAylar: ["May", "Haz", "Tem", "Ağu", "Eyl", "Eki", "Kas", "Ara", "Oca", "Şub", "Mar", "Nis"]
 };
 
-function formatMoney(value) {
-    if (value >= 1000000) return `$${(value/1000000).toFixed(1)}M`;
-    if (value >= 1000) return `$${(value/1000).toFixed(0)}K`;
-    return `$${value.toLocaleString()}`;
-}
+function formatMoney(v) { if(v>=1000000) return `$${(v/1000000).toFixed(1)}M`; if(v>=1000) return `$${(v/1000).toFixed(0)}K`; return `$${v.toLocaleString()}`; }
+function kpiKarti(b,d,y,yn,r) { const rc = r==='yesil'?(yn==='↑'?'text-green-400':'text-red-400'):'text-yellow-400'; return `<div class="aladdin-card p-4"><div class="text-gray-500 text-xs">${b}</div><div class="text-white kpi-value mt-1">${d}</div><div class="flex items-center gap-1 mt-2"><span class="${rc} text-xs">${yn} ${y}</span></div></div>`; }
 
-function kpiKarti(baslik, deger, degisim, yon, renk) {
-    const renkClass = renk === 'yesil' ? (yon === '↑' ? 'text-green-400' : 'text-red-400') : 'text-yellow-400';
-    return `<div class="aladdin-card p-4"><div class="text-gray-500 text-xs uppercase tracking-wider">${baslik}</div><div class="text-white kpi-value mt-1">${deger}</div><div class="flex items-center gap-1 mt-2"><span class="${renkClass} text-xs">${yon} ${degisim}</span></div></div>`;
-}
+function modulCommand() { document.getElementById('activeModuleDisplay').innerText = 'Yönetici Komuta Merkezi'; let kpiHtml = ''; const k = [['Toplam Varlık',formatMoney(dashboardData.toplamVarlik),'+12.4%','↑','yesil'],['Net Servet',formatMoney(dashboardData.netServet),'+8.2%','↑','yesil'],['Aylık Nakit',formatMoney(dashboardData.aylikNakitAkisi),'+18.7%','↑','yesil'],['Yıllık Büyüme',dashboardData.yillikBuyume+'%','+2.1%','↑','yesil'],['Portföy Getirisi',dashboardData.portfoyGetirisi+'%','+1.8%','↑','yesil'],['Risk Skoru',dashboardData.riskSkoru+'/100','-3','↓','sari'],['Topluluk Üyesi',dashboardData.uyeSayisi.toLocaleString(),'+42','↑','yesil'],['Aktif Aboneler',dashboardData.aktifAbone.toLocaleString(),'+28','↑','yesil'],['LTV',formatMoney(dashboardData.ltv),'+$240','↑','yesil'],['CAC',formatMoney(dashboardData.cac),'-$20','↓','yesil'],['NPS',dashboardData.nps,'+5','↑','yesil'],['ESG',dashboardData.esgSkoru+'/100','+2','↑','yesil']]; k.forEach(x=>kpiHtml+=kpiKarti(x[0],x[1],x[2],x[3],x[4])); let okrHtml=''; dashboardData.okrlar.forEach(o=>{const y=(o.ilerleme/o.target)*100; okrHtml+=`<div class="mb-3"><div class="flex justify-between text-sm"><span class="text-gray-300">${o.hedef}</span><span class="text-white">${o.ilerleme}/${o.target}</span></div><div class="h-2 bg-gray-800 rounded-full"><div class="h-full gold-bg rounded-full" style="width:${y}%"></div></div></div>`;}); return `<div class="space-y-6"><div class="grid grid-cols-4 gap-4">${kpiHtml}</div><div class="grid grid-cols-2 gap-6"><div class="aladdin-card p-5"><h3 class="gold-text text-sm font-semibold mb-4">📈 MEDENİYET TRENDİ</h3><canvas id="civTrendChart" height="200"></canvas></div><div class="aladdin-card p-5"><h3 class="gold-text text-sm font-semibold mb-4">👥 TOPLULUK BÜYÜMESİ</h3><canvas id="memberTrendChart" height="200"></canvas></div></div><div class="grid grid-cols-2 gap-6"><div class="aladdin-card p-5"><h3 class="gold-text text-sm font-semibold mb-4">🎯 OKR TAKİBİ</h3>${okrHtml}</div><div class="aladdin-card p-5"><h3 class="gold-text text-sm font-semibold mb-4">📋 SON AKTİVİTELER</h3><div class="space-y-2">${['3 yeni kurucu üye katıldı','Afyon termal arazi ön onayı','CIO raporu yayınlandı','Eğitime 45 yeni kayıt'].map((a,i)=>`<div class="flex items-center gap-3 text-sm"><div class="w-2 h-2 gold-bg rounded-full"></div><div class="text-gray-300">${a}</div><div class="text-gray-600 text-xs ml-auto">${i+1} saat önce</div></div>`).join('')}</div></div></div></div>`; }
 
-function modulCommand() {
-    document.getElementById('activeModuleDisplay').innerText = 'Yönetici Komuta Merkezi';
-    let kpiHtml = '';
-    const kpiList = [
-        ['Toplam Varlık', formatMoney(dashboardData.toplamVarlik), '+12.4%', '↑', 'yesil'],
-        ['Net Servet', formatMoney(dashboardData.netServet), '+8.2%', '↑', 'yesil'],
-        ['Aylık Nakit Akışı', formatMoney(dashboardData.aylikNakitAkisi), '+18.7%', '↑', 'yesil'],
-        ['Yıllık Büyüme', dashboardData.yillikBuyume + '%', '+2.1%', '↑', 'yesil'],
-        ['Portföy Getirisi', dashboardData.portfoyGetirisi + '%', '+1.8%', '↑', 'yesil'],
-        ['Risk Skoru', dashboardData.riskSkoru + '/100', '-3', '↓', 'sari'],
-        ['Topluluk Üyesi', dashboardData.uyeSayisi.toLocaleString(), '+42', '↑', 'yesil'],
-        ['Aktif Aboneler', dashboardData.aktifAbone.toLocaleString(), '+28', '↑', 'yesil'],
-        ['Müşteri LTV', formatMoney(dashboardData.ltv), '+$240', '↑', 'yesil'],
-        ['Müşteri CAC', formatMoney(dashboardData.cac), '-$20', '↓', 'yesil'],
-        ['NPS', dashboardData.nps, '+5', '↑', 'yesil'],
-        ['ESG Skoru', dashboardData.esgSkoru + '/100', '+2', '↑', 'yesil']
-    ];
-    kpiList.forEach(k => { kpiHtml += kpiKarti(k[0], k[1], k[2], k[3], k[4]); });
-    
-    let okrHtml = '';
-    dashboardData.okrlar.forEach(okr => {
-        const yuzde = (okr.ilerleme / okr.target) * 100;
-        okrHtml += `<div class="mb-3"><div class="flex justify-between text-sm"><span class="text-gray-300">${okr.hedef}</span><span class="text-white">${okr.ilerleme}/${okr.target}</span></div><div class="h-2 bg-gray-800 rounded-full"><div class="h-full gold-bg rounded-full" style="width:${yuzde}%"></div></div><div class="text-gray-500 text-xs mt-1">Hedef: ${okr.tarih}</div></div>`;
-    });
-    
-    return `<div class="space-y-6"><div class="grid grid-cols-4 gap-4">${kpiHtml}</div><div class="grid grid-cols-2 gap-6"><div class="aladdin-card p-5"><h3 class="gold-text text-sm font-semibold mb-4"><i class="fas fa-chart-line mr-2"></i> MEDENİYET TRENDİ</h3><canvas id="civTrendChart" height="200"></canvas></div><div class="aladdin-card p-5"><h3 class="gold-text text-sm font-semibold mb-4"><i class="fas fa-users mr-2"></i> TOPLULUK BÜYÜMESİ</h3><canvas id="memberTrendChart" height="200"></canvas></div></div><div class="grid grid-cols-2 gap-6"><div class="aladdin-card p-5"><h3 class="gold-text text-sm font-semibold mb-4">OKR TAKİBİ</h3>${okrHtml}</div><div class="aladdin-card p-5"><h3 class="gold-text text-sm font-semibold mb-4">SON AKTİVİTELER</h3><div class="space-y-2">${['3 yeni kurucu üye katıldı','Afyon termal arazi ön onayı','CIO yatırım raporu yayınlandı','Eğitim akademisine 45 yeni kayıt'].map((act,i)=>`<div class="flex items-center gap-3 text-sm"><div class="w-2 h-2 gold-bg rounded-full"></div><div class="text-gray-300">${act}</div><div class="text-gray-600 text-xs ml-auto">${i+1} saat önce</div></div>`).join('')}</div></div></div></div>`;
-}
+function modulMedeniyet() { document.getElementById('activeModuleDisplay').innerText = 'Medeniyet Etki Endeksi'; let f=''; Object.entries(dashboardData.medeniyetFaktorleri).forEach(([k,v])=>{ f+=`<div><div class="text-gray-500 text-xs uppercase">${k}</div><div class="text-white text-xl font-bold">${v}</div><div class="h-1.5 bg-gray-800 rounded-full"><div class="h-full gold-bg rounded-full" style="width:${v}%"></div></div></div>`;}); return `<div class="space-y-6"><div class="grid grid-cols-2 gap-6"><div class="aladdin-card p-6 text-center"><div class="text-gray-400 text-sm">Medeniyet Gücü Endeksi</div><div class="text-7xl font-bold gold-text my-4">${dashboardData.medeniyetSkoru}</div><div class="text-green-400 text-sm">+2.3% son 30 gün</div><div class="mt-6 grid grid-cols-2 gap-3 text-left">${f}</div></div><div class="aladdin-card p-5"><h3 class="gold-text text-sm font-semibold mb-4">🏛️ MEDENİYET FORMÜLÜ</h3><div class="bg-black/40 rounded-lg p-4 font-mono text-sm text-gray-300 mb-4">Medeniyet = Bilgi × Kurumlar × Liderlik × Sermaye × Kültür × Nesiller</div><div class="p-4 border-l-4 border-[#D4AF37] bg-gradient-to-r from-yellow-900/20"><div class="text-xs text-gray-400">ORHAN BOYRAZ NOTU</div><div class="text-sm text-gray-300">"Bilgi ve kültür güçlü, nesiller faktörü iyileştirilmeli."</div></div></div></div><div class="aladdin-card p-5"><h3 class="gold-text text-sm font-semibold mb-4">📊 TARİHSEL GELİŞİM</h3><canvas id="civHistoricalChart" height="200"></canvas></div></div>`; }
 
-function modulMedeniyet() {
-    document.getElementById('activeModuleDisplay').innerText = 'Medeniyet Etki Endeksi';
-    let faktorHtml = '';
-    Object.entries(dashboardData.medeniyetFaktorleri).forEach(([k,v]) => {
-        faktorHtml += `<div><div class="text-gray-500 text-xs uppercase">${k}</div><div class="text-white text-xl font-bold">${v}</div><div class="h-1.5 bg-gray-800 rounded-full"><div class="h-full gold-bg rounded-full" style="width:${v}%"></div></div></div>`;
-    });
-    return `<div class="space-y-6"><div class="grid grid-cols-2 gap-6"><div class="aladdin-card p-6 text-center"><div class="text-gray-400 text-sm">Medeniyet Gücü Endeksi</div><div class="text-7xl font-bold gold-text my-4">${dashboardData.medeniyetSkoru}</div><div class="text-green-400 text-sm">+2.3% son 30 gün</div><div class="mt-6 grid grid-cols-2 gap-3 text-left">${faktorHtml}</div></div><div class="aladdin-card p-5"><h3 class="gold-text text-sm font-semibold mb-4">MEDENİYET FORMÜLÜ</h3><div class="bg-black/40 rounded-lg p-4 font-mono text-sm text-gray-300 mb-4">Medeniyet = Bilgi × Kurumlar × Liderlik × Sermaye × Kültür × Nesiller</div><div class="p-4 bg-gradient-to-r from-yellow-900/20 to-transparent rounded-lg border-l-4 border-[#D4AF37]"><div class="text-xs text-gray-400">ORHAN BOYRAZ NOTU</div><div class="text-sm text-gray-300">"Bilgi ve kültür güçlü, nesiller faktörü iyileştirilmeli. 3. nesil liderlik programı başlatılıyor."</div></div></div></div><div class="aladdin-card p-5"><h3 class="gold-text text-sm font-semibold mb-4">TARİHSEL GELİŞİM</h3><canvas id="civHistoricalChart" height="200"></canvas></div></div>`;
-}
+function modulFinans() { document.getElementById('activeModuleDisplay').innerText = 'Finans Kontrol Kulesi'; return `<div class="space-y-6"><div class="grid grid-cols-3 gap-4">${kpiKarti('Likit Varlıklar',formatMoney(45600000),'+5.2%','↑','yesil')}${kpiKarti('Yatırım Portföyü',formatMoney(78200000),'+12.4%','↑','yesil')}${kpiKarti('Fiziksel Varlıklar',formatMoney(60400000),'+8.7%','↑','yesil')}</div><div class="grid grid-cols-2 gap-6"><div class="aladdin-card p-5"><h3 class="gold-text text-sm font-semibold mb-4">💰 PORTFÖY DAĞILIMI</h3><canvas id="portfolioChart" height="250"></canvas></div><div class="aladdin-card p-5"><h3 class="gold-text text-sm font-semibold mb-4">💵 NAKİT AKIŞI</h3><canvas id="cashFlowChart" height="250"></canvas></div></div></div>`; }
 
-function modulFinans() {
-    document.getElementById('activeModuleDisplay').innerText = 'Finans Kontrol Kulesi';
-    return `<div class="space-y-6"><div class="grid grid-cols-3 gap-4">${kpiKarti('Likit Varlıklar', formatMoney(45600000), '+5.2%', '↑', 'yesil')}${kpiKarti('Yatırım Portföyü', formatMoney(78200000), '+12.4%', '↑', 'yesil')}${kpiKarti('Fiziksel Varlıklar', formatMoney(60400000), '+8.7%', '↑', 'yesil')}</div><div class="grid grid-cols-2 gap-6"><div class="aladdin-card p-5"><h3 class="gold-text text-sm font-semibold mb-4">PORTFÖY DAĞILIMI</h3><canvas id="portfolioChart" height="250"></canvas></div><div class="aladdin-card p-5"><h3 class="gold-text text-sm font-semibold mb-4">NAKİT AKIŞI</h3><canvas id="cashFlowChart" height="250"></canvas></div></div></div>`;
-}
+function modulAileOfisi() { document.getElementById('activeModuleDisplay').innerText = 'Aile Ofisi & Çok Nesil Servet'; return `<div class="space-y-6"><div class="aladdin-card p-6"><h3 class="gold-text text-sm font-semibold mb-4">👑 NESİLLER ARASI SERVET</h3><div class="grid grid-cols-4 gap-4 text-center"><div class="bg-black/40 rounded-lg p-4"><div class="text-gray-500 text-xs">1.Nesil</div><div class="text-white text-xl">$127.8M</div></div><div class="bg-black/40 rounded-lg p-4"><div class="text-gray-500 text-xs">2.Nesil</div><div class="text-white text-xl">$142.3M</div><div class="text-green-400 text-xs">+11%</div></div><div class="bg-black/40 rounded-lg p-4"><div class="text-gray-500 text-xs">3.Nesil</div><div class="text-white text-xl">$168.7M</div><div class="text-green-400 text-xs">+19%</div></div><div class="bg-black/40 rounded-lg p-4 gold-border"><div class="text-gray-500 text-xs">4.Nesil</div><div class="text-white text-xl">$215.4M</div><div class="text-green-400 text-xs">+28%</div></div></div></div><div class="grid grid-cols-2 gap-6"><div class="aladdin-card p-5"><h3 class="gold-text text-sm font-semibold mb-4">📋 SERVET AKTARIMI</h3>${[['Vakıf',35],['Trust Offshore',25],['Doğrudan Miras',20],['Hayır Kurumu',20]].map(([n,v])=>`<div class="mb-2"><div class="flex justify-between"><span class="text-gray-300">${n}</span><span class="text-white">%${v}</span></div><div class="h-2 bg-gray-800 rounded-full"><div class="h-full gold-bg rounded-full" style="width:${v}%"></div></div></div>`).join('')}</div><div class="aladdin-card p-5 text-center"><div class="text-6xl font-bold gold-text">96<span class="text-2xl text-gray-400">%</span></div><div class="text-gray-400 text-sm mt-2">Aile Anayasası Uyumu</div><div class="mt-4 text-green-400 text-xs">✓ Tüm maddeler aktif<br>✓ 5 nesil geçerlilik<br>✓ Tahkim hazır</div></div></div></div>`; }
 
-function modulAileOfisi() {
-    document.getElementById('activeModuleDisplay').innerText = 'Aile Ofisi & Çok Nesil Servet';
-    return `<div class="space-y-6"><div class="aladdin-card p-6"><h3 class="gold-text text-sm font-semibold mb-4">NESİLLER ARASI SERVET</h3><div class="grid grid-cols-4 gap-4 text-center"><div class="bg-black/40 rounded-lg p-4"><div class="text-gray-500 text-xs">1. Nesil</div><div class="text-white text-xl font-bold">$127.8M</div></div><div class="bg-black/40 rounded-lg p-4"><div class="text-gray-500 text-xs">2. Nesil</div><div class="text-white text-xl font-bold">$142.3M</div><div class="text-green-400 text-xs">+11%</div></div><div class="bg-black/40 rounded-lg p-4"><div class="text-gray-500 text-xs">3. Nesil</div><div class="text-white text-xl font-bold">$168.7M</div><div class="text-green-400 text-xs">+19%</div></div><div class="bg-black/40 rounded-lg p-4 gold-border border"><div class="text-gray-500 text-xs">4. Nesil</div><div class="text-white text-xl font-bold">$215.4M</div><div class="text-green-400 text-xs">+28%</div></div></div></div><div class="grid grid-cols-2 gap-6"><div class="aladdin-card p-5"><h3 class="gold-text text-sm font-semibold mb-4">SERVET AKTARIMI</h3>${[['Vakıf',35],['Trust (Offshore)',25],['Doğrudan Miras',20],['Hayır Kurumu',20]].map(([n,v])=>`<div class="mb-2"><div class="flex justify-between text-sm"><span class="text-gray-300">${n}</span><span class="text-white">%${v}</span></div><div class="h-2 bg-gray-800 rounded-full"><div class="h-full gold-bg rounded-full" style="width:${v}%"></div></div></div>`).join('')}</div><div class="aladdin-card p-5 text-center"><div class="text-6xl font-bold gold-text">96<span class="text-2xl text-gray-400">%</span></div><div class="text-gray-400 text-sm mt-2">Aile Anayasası Uyumu</div><div class="mt-4 text-green-400 text-xs">✓ Tüm maddeler aktif</div><div class="text-green-400 text-xs">✓ 5 nesil geçerlilik</div><div class="text-green-400 text-xs">✓ Tahkim mekanizması hazır</div></div></div></div>`;
-}
+function modulRisk() { document.getElementById('activeModuleDisplay').innerText = 'Risk Yönetim Merkezi'; let rHtml=''; dashboardData.riskler.forEach(r=>{let st=r.seviye==='yuksek'?'Yüksek':(r.seviye==='orta'?'Orta':'Düşük'); let rnk=r.seviye==='yuksek'?'bg-red-500':(r.seviye==='orta'?'bg-yellow-500':'bg-green-500'); let yz=r.seviye==='yuksek'?'text-red-400':(r.seviye==='orta'?'text-yellow-400':'text-green-400'); rHtml+=`<div class="bg-black/40 p-3 rounded-lg"><div class="text-gray-400 text-xs">${r.name}</div><div class="flex justify-between items-center"><div class="text-white font-bold text-lg">${r.skor}</div><div class="text-xs ${yz}">${st}</div></div><div class="h-1.5 bg-gray-800 rounded-full mt-2"><div class="h-full rounded-full ${rnk}" style="width:${r.skor}%"></div></div></div>`;}); return `<div class="space-y-6"><div class="grid grid-cols-2 gap-6"><div class="aladdin-card p-5"><h3 class="gold-text text-sm font-semibold mb-4">🔥 RİSK HEATMAP</h3><div class="grid grid-cols-2 gap-2">${rHtml}</div></div><div class="space-y-6"><div class="aladdin-card p-5"><h3 class="gold-text text-sm font-semibold mb-4">📊 VAR %99 GÜVEN</h3><div class="text-center"><div class="text-4xl font-bold text-red-400">$4.2M</div><div class="text-gray-400 text-sm">Aylık Riske Maruz Değer</div></div></div><div class="aladdin-card p-5"><h3 class="gold-text text-sm font-semibold mb-4">🎭 SENARYO ANALİZİ</h3>${[['Piyasa düşüşü -%20','-$8.3M','red'],['Jeopolitik kriz','-$12.1M','red'],['Siber saldırı','-$2.5M','yellow'],['Regülasyon','-$5.2M','yellow']].map(s=>`<div class="flex justify-between"><span class="text-gray-400">${s[0]}</span><span class="text-${s[2]}-400">${s[1]}</span></div>`).join('')}</div></div></div></div>`; }
 
-function modulRisk() {
-    document.getElementById('activeModuleDisplay').innerText = 'Risk Yönetim Merkezi';
-    let riskHtml = '';
-    dashboardData.riskler.forEach(r => {
-        let seviyeText = r.seviye === 'yuksek' ? 'Yüksek' : (r.seviye === 'orta' ? 'Orta' : 'Düşük');
-        let renk = r.seviye === 'yuksek' ? 'bg-red-500' : (r.seviye === 'orta' ? 'bg-yellow-500' : 'bg-green-500');
-        let yaziRenk = r.seviye === 'yuksek' ? 'text-red-400' : (r.seviye === 'orta' ? 'text-yellow-400' : 'text-green-400');
-        riskHtml += `<div class="bg-black/40 p-3 rounded-lg"><div class="text-gray-400 text-xs">${r.name}</div><div class="flex justify-between items-center mt-1"><div class="text-white font-bold text-lg">${r.skor}</div><div class="text-xs ${yaziRenk}">${seviyeText}</div></div><div class="h-1.5 bg-gray-800 rounded-full mt-2"><div class="h-full rounded-full ${renk}" style="width:${r.skor}%"></div></div></div>`;
-    });
-    return `<div class="space-y-6"><div class="grid grid-cols-2 gap-6"><div class="aladdin-card p-5"><h3 class="gold-text text-sm font-semibold mb-4">RİSK HEATMAP</h3><div class="grid grid-cols-2 gap-2">${riskHtml}</div></div><div class="space-y-6"><div class="aladdin-card p-5"><h3 class="gold-text text-sm font-semibold mb-4">VAR · %99 GÜVEN</h3><div class="text-center py-4"><div class="text-4xl font-bold text-red-400">$4.2M</div><div class="text-gray-400 text-sm">Aylık Riske Maruz Değer</div></div></div><div class="aladdin-card p-5"><h3 class="gold-text text-sm font-semibold mb-4">SENARYO ANALİZİ</h3>${[['Piyasa düşüşü -%20','-$8.3M','red'],['Jeopolitik kriz','-$12.1M','red'],['Siber saldırı','-$2.5M','yellow'],['Regülasyon değişikliği','-$5.2M','yellow']].map(s=>`<div class="flex justify-between text-sm"><span class="text-gray-400">${s[0]}</span><span class="text-${s[2]}-400">${s[1]}</span></div>`).join('')}</div></div></div></div>`;
-}
+function modulTopluluk() { document.getElementById('activeModuleDisplay').innerText = 'Topluluk & Üyelik'; return `<div class="space-y-6"><div class="grid grid-cols-4 gap-4">${kpiKarti('Toplam Üye',dashboardData.uyeSayisi.toLocaleString(),'+42','↑','yesil')}${kpiKarti('Aktif Abone',dashboardData.aktifAbone.toLocaleString(),'+28','↑','yesil')}${kpiKarti('Kurucu Üye','12','+2','↑','yesil')}${kpiKarti('Aylık Aidat',formatMoney(189000),'+8%','↑','yesil')}</div><div class="grid grid-cols-2 gap-6"><div class="aladdin-card p-5"><h3 class="gold-text text-sm font-semibold mb-4">🌍 COĞRAFİ DAĞILIM</h3>${[['Türkiye',62],['Avrupa',18],['Orta Doğu',12],['Asya',5],['Amerika',3]].map(([c,v])=>`<div><div class="text-gray-400 text-xs">${c}</div><div class="text-white text-xl font-bold">%${v}</div><div class="h-1.5 bg-gray-800 rounded-full"><div class="h-full gold-bg rounded-full" style="width:${v}%"></div></div></div>`).join('')}</div><div class="aladdin-card p-5"><h3 class="gold-text text-sm font-semibold mb-4">🏷️ ÜYELİK SEVİYELERİ</h3>${[['Bronz',342,40],['Gümüş',287,34],['Altın',146,17],['Platin',60,7],['Kurucu',12,1.4]].map(([t,c,p])=>`<div class="flex justify-between items-center mb-2"><span class="text-gray-300">${t}</span><span class="text-white">${c}</span><div class="w-20 h-1.5 bg-gray-800 rounded-full"><div class="h-full gold-bg rounded-full" style="width:${p}%"></div></div></div>`).join('')}</div></div></div>`; }
 
-function modulTopluluk() {
-    document.getElementById('activeModuleDisplay').innerText = 'Topluluk & Üyelik Yönetimi';
-    return `<div class="space-y-6"><div class="grid grid-cols-4 gap-4">${kpiKarti('Toplam Üye', dashboardData.uyeSayisi.toLocaleString(), '+42', '↑', 'yesil')}${kpiKarti('Aktif Aboneler', dashboardData.aktifAbone.toLocaleString(), '+28', '↑', 'yesil')}${kpiKarti('Kurucu Üye', '12', '+2', '↑', 'yesil')}${kpiKarti('Aylık Aidat', formatMoney(189000), '+8%', '↑', 'yesil')}</div><div class="grid grid-cols-2 gap-6"><div class="aladdin-card p-5"><h3 class="gold-text text-sm font-semibold mb-4">COĞRAFİ DAĞILIM</h3>${[['Türkiye',62],['Avrupa',18],['Orta Doğu',12],['Asya',5],['Amerika',3]].map(([c,v])=>`<div><div class="text-gray-400 text-xs">${c}</div><div class="text-white text-xl font-bold">%${v}</div><div class="h-1.5 bg-gray-800 rounded-full"><div class="h-full gold-bg rounded-full" style="width:${v}%"></div></div></div>`).join('')}</div><div class="aladdin-card p-5"><h3 class="gold-text text-sm font-semibold mb-4">ÜYELİK SEVİYELERİ</h3>${[['Bronz ($49/ay)',342,40],['Gümüş ($199/ay)',287,34],['Altın ($499/ay)',146,17],['Platin ($1,999/ay)',60,7],['Kurucu ($4,999/ay)',12,1.4]].map(([t,c,p])=>`<div class="flex justify-between items-center mb-2"><span class="text-gray-300 text-sm">${t}</span><span class="text-white text-sm">${c} üye</span><div class="w-20 h-1.5 bg-gray-800 rounded-full"><div class="h-full gold-bg rounded-full" style="width:${p}%"></div></div></div>`).join('')}</div></div><div class="aladdin-card p-5"><h3 class="gold-text text-sm font-semibold mb-4">SON KATILAN KURUCU ÜYELER</h3><table class="w-full text-left"><thead class="text-gray-500 text-xs border-b border-[#1E2340]"><tr><th class="py-2">İsim</th><th>Üyelik</th><th>Katkı</th></tr></thead><tbody class="text-gray-300 text-sm">${[['Ahmet Kaya','Kurucu','$100,000'],['Mehmet Demir','Kurucu','$75,000'],['Zeynep Sarı','Platin','$25,000'],['Ali Rıza','Altın','$10,000']].map(r=>`<tr class="border-b border-[#1E2340]"><td class="py-2">${r[0]}</td><td class="gold-text">${r[1]}</td><td>${r[2]}</td></tr>`).join('')}</tbody></table></div></div>`;
-}
-
-function modulGenel(id, name) {
-    document.getElementById('activeModuleDisplay').innerText = name;
-    return `<div class="aladdin-card p-8 text-center"><i class="fas fa-chart-line fa-spin text-4xl gold-text mb-4"></i><h3 class="text-white text-xl">${name}</h3><p class="text-gray-400 mt-2">Bu modül aktif olarak çalışmaktadır.</p><div class="mt-6 grid grid-cols-3 gap-4 text-left"><div class="bg-black/40 p-4 rounded-lg"><div class="text-gray-500 text-xs">Örnek Metrik 1</div><div class="text-white text-xl font-bold gold-text">%84</div></div><div class="bg-black/40 p-4 rounded-lg"><div class="text-gray-500 text-xs">Örnek Metrik 2</div><div class="text-white text-xl font-bold gold-text">1,247</div></div><div class="bg-black/40 p-4 rounded-lg"><div class="text-gray-500 text-xs">Örnek Metrik 3</div><div class="text-white text-xl font-bold gold-text">+%12</div></div></div><div class="mt-4 text-xs text-gray-500">Tüm 24 modül aktif ve çalışır durumdadır. Veriler gerçek zamanlı olarak güncellenmektedir.</div></div>`;
-}
+function modulGenel(name, desc) { document.getElementById('activeModuleDisplay').innerText = name; return `<div class="aladdin-card p-8"><div class="text-center"><i class="fas fa-chart-line fa-3x gold-text mb-4"></i><h3 class="text-white text-xl font-bold">${name}</h3><p class="text-gray-400 mt-2">${desc}</p><div class="mt-6 p-4 bg-gray-800/30 rounded-lg"><div class="text-emerald-400 text-sm">📊 Örnek Veriler</div><div class="grid grid-cols-3 gap-4 mt-3"><div class="text-center"><div class="text-gray-500 text-xs">Metrik 1</div><div class="text-white text-xl gold-text">%84</div></div><div class="text-center"><div class="text-gray-500 text-xs">Metrik 2</div><div class="text-white text-xl gold-text">1,247</div></div><div class="text-center"><div class="text-gray-500 text-xs">Metrik 3</div><div class="text-white text-xl gold-text">+%12</div></div></div></div><div class="mt-4 text-xs text-gray-500">Bu modül aktif olarak çalışmaktadır. Gerçek zamanlı veriler yakında eklenecektir.</div></div></div>`; }
 
 function renderModule(moduleId) {
-    const contentDiv = document.getElementById('moduleContent');
-    if (!contentDiv) return;
-    
-    const modul = modules.find(m => m.id === moduleId);
-    
-    switch(moduleId) {
-        case "command": contentDiv.innerHTML = modulCommand(); break;
-        case "civilization": contentDiv.innerHTML = modulMedeniyet(); break;
-        case "financial": case "portfolio": contentDiv.innerHTML = modulFinans(); break;
-        case "familyoffice": case "multigen": contentDiv.innerHTML = modulAileOfisi(); break;
-        case "risk": contentDiv.innerHTML = modulRisk(); break;
-        case "community": case "crm": contentDiv.innerHTML = modulTopluluk(); break;
-        default: contentDiv.innerHTML = modulGenel(moduleId, modul ? modul.name : moduleId);
-    }
-    
-    setTimeout(() => {
-        if (moduleId === "command") {
-            const ctx1 = document.getElementById('civTrendChart');
-            if(ctx1) new Chart(ctx1, { type: 'line', data: { labels: dashboardData.medeniyetAylar, datasets: [{ data: dashboardData.medeniyetTrend, borderColor: '#D4AF37', fill: true, tension: 0.3 }] }, options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { grid: { color: '#1F2937' } } } } });
-            const ctx2 = document.getElementById('memberTrendChart');
-            if(ctx2) new Chart(ctx2, { type: 'line', data: { labels: dashboardData.uyeAylar, datasets: [{ data: dashboardData.uyeTrend, borderColor: '#3B82F6', fill: true, tension: 0.3 }] }, options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { grid: { color: '#1F2937' } } } } });
+    const m = modules.find(x=>x.id===moduleId);
+    if(!m) return;
+    const content = document.getElementById('moduleContent');
+    if(m.id==="command") content.innerHTML = modulCommand();
+    else if(m.id==="civilization") content.innerHTML = modulMedeniyet();
+    else if(m.id==="financial" || m.id==="portfolio") content.innerHTML = modulFinans();
+    else if(m.id==="familyoffice" || m.id==="multigen") content.innerHTML = modulAileOfisi();
+    else if(m.id==="risk") content.innerHTML = modulRisk();
+    else if(m.id==="community" || m.id==="crm") content.innerHTML = modulTopluluk();
+    else content.innerHTML = modulGenel(m.name, m.desc);
+    setTimeout(()=>{
+        if(m.id==="command") {
+            const c1=document.getElementById('civTrendChart'); if(c1) new Chart(c1,{type:'line',data:{labels:dashboardData.medeniyetAylar,datasets:[{data:dashboardData.medeniyetTrend,borderColor:'#D4AF37',fill:true,tension:0.3}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{grid:{color:'#1F2937'}}}}});
+            const c2=document.getElementById('memberTrendChart'); if(c2) new Chart(c2,{type:'line',data:{labels:dashboardData.uyeAylar,datasets:[{data:dashboardData.uyeTrend,borderColor:'#3B82F6',fill:true,tension:0.3}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{grid:{color:'#1F2937'}}}}});
         }
-        if (moduleId === "civilization") {
-            const ctx = document.getElementById('civHistoricalChart');
-            if(ctx) new Chart(ctx, { type: 'line', data: { labels: dashboardData.medeniyetAylar, datasets: [{ data: dashboardData.medeniyetTrend, borderColor: '#D4AF37', fill: true, tension: 0.3 }] }, options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { min: 60, max: 100 } } } });
+        if(m.id==="civilization") { const c=document.getElementById('civHistoricalChart'); if(c) new Chart(c,{type:'line',data:{labels:dashboardData.medeniyetAylar,datasets:[{data:dashboardData.medeniyetTrend,borderColor:'#D4AF37',fill:true,tension:0.3}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{min:60,max:100,grid:{color:'#1F2937'}}}}}); }
+        if(m.id==="financial") {
+            const p=document.getElementById('portfolioChart'); if(p) new Chart(p,{type:'doughnut',data:{labels:dashboardData.portfoy.map(x=>x.name),datasets:[{data:dashboardData.portfoy.map(x=>x.value),backgroundColor:['#D4AF37','#3B82F6','#10B981','#F59E0B','#EF4444']}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{color:'#9CA3AF'}}}}});
+            const cf=document.getElementById('cashFlowChart'); if(cf) new Chart(cf,{type:'bar',data:{labels:['Oca','Şub','Mar','Nis','May','Haz'],datasets:[{data:[2100,2250,2400,2380,2550,2720],backgroundColor:'#D4AF37',borderRadius:8}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{grid:{color:'#1F2937'}}}}});
         }
-        if (moduleId === "financial") {
-            const ctx1 = document.getElementById('portfolioChart');
-            if(ctx1) new Chart(ctx1, { type: 'doughnut', data: { labels: dashboardData.portfoy.map(p=>p.name), datasets: [{ data: dashboardData.portfoy.map(p=>p.value), backgroundColor: ['#D4AF37','#3B82F6','#10B981','#F59E0B','#EF4444'] }] }, options: { responsive: true, plugins: { legend: { position: 'bottom', labels: { color: '#9CA3AF' } } } } });
-            const ctx2 = document.getElementById('cashFlowChart');
-            if(ctx2) new Chart(ctx2, { type: 'bar', data: { labels: ['Oca','Şub','Mar','Nis','May','Haz'], datasets: [{ data: [2100,2250,2400,2380,2550,2720], backgroundColor: '#D4AF37', borderRadius: 8 }] }, options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { grid: { color: '#1F2937' } } } } });
-        }
-    }, 100);
+    },100);
 }
 
 function buildNavigation() {
-    const navMenu = document.getElementById('navMenu');
+    const nav = document.getElementById('navMenu');
     const groups = { core: "ANA STRATEJİ", finance: "FİNANS & SERMAYE", people: "TOPLULUK & İNSAN", assets: "FİZİKSEL VARLIKLAR", tech: "TEKNOLOJİ & RİSK" };
-    let html = '', currentGroup = '';
-    modules.forEach(mod => {
-        if (groups[mod.group] !== currentGroup) {
-            currentGroup = groups[mod.group];
-            html += `<div class="text-gray-600 text-xs uppercase tracking-wider px-4 pt-4 pb-2">${currentGroup}</div>`;
-        }
-        html += `<div class="nav-item flex items-center gap-3" data-module="${mod.id}"><i class="fas ${mod.icon} text-gray-500 text-sm w-5"></i><span class="text-gray-300 text-sm">${mod.name}</span></div>`;
+    let html='', cur='';
+    modules.forEach(m=>{
+        if(groups[m.group] !== cur) { cur = groups[m.group]; html += `<div class="text-gray-600 text-xs uppercase tracking-wider px-4 pt-4 pb-2">${cur}</div>`; }
+        html += `<div class="nav-item flex items-center gap-3" data-module="${m.id}"><i class="fas ${m.icon} text-gray-500 text-sm w-5"></i><span class="text-gray-300 text-sm">${m.name}</span></div>`;
     });
-    navMenu.innerHTML = html;
-    document.querySelectorAll('.nav-item').forEach(item => {
-        item.addEventListener('click', () => {
-            document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active', 'bg-[rgba(212,175,55,0.1)]', 'border-l-3', 'border-[#D4AF37]'));
-            item.classList.add('active', 'bg-[rgba(212,175,55,0.1)]', 'border-l-3', 'border-[#D4AF37]');
-            renderModule(item.getAttribute('data-module'));
+    nav.innerHTML = html;
+    document.querySelectorAll('.nav-item').forEach(item=>{
+        item.addEventListener('click',()=>{
+            document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active','bg-[rgba(212,175,55,0.1)]','border-l-3','border-[#D4AF37]'));
+            item.classList.add('active','bg-[rgba(212,175,55,0.1)]','border-l-3','border-[#D4AF37]');
+            renderModule(item.dataset.module);
         });
     });
     document.querySelector('.nav-item')?.click();
 }
 
-function updateDateTime() {
-    const now = new Date();
-    document.getElementById('currentDateTime').innerText = now.toLocaleString('tr-TR');
-}
+function updateDateTime() { document.getElementById('currentDateTime').innerText = new Date().toLocaleString('tr-TR'); }
 </script>
 </body>
 </html>
